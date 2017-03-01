@@ -41,12 +41,78 @@ void func3(int *b)
 	*b = 3;
 }
 
+struct TestInnerClass
+{
+	void setInnerData(int input);
+	int getInnerData();
+	private:
+		int innerData;
+};
+
+
+struct TestOuterClass
+{
+	void setInnerData(int input);
+	int getInnerData();
+	TestInnerClass * getInner_pointer();
+	TestInnerClass & getInner_quote();
+	private:
+		int outerData;
+		TestInnerClass inner;
+};
+
+void TestInnerClass::setInnerData(int input)
+{
+	innerData=input;
+}
+
+int TestInnerClass::getInnerData()
+{
+	return innerData;
+}
+
+
+
+TestInnerClass * TestOuterClass::getInner_pointer()
+{
+	return &inner;
+}
+
+TestInnerClass & TestOuterClass::getInner_quote()
+{
+	return inner;
+}
+
+void TestOuterClass::setInnerData(int input)
+{
+	inner.setInnerData(input);
+}
+
+int TestOuterClass::getInnerData()
+{
+	return inner.getInnerData();
+}
+
+
 
 
 
 int main()
 {
     cout<<"main"<<endl;
+	cout<<"testing pointer and quote"<<endl;
+	TestOuterClass outer;
+	outer.setInnerData(100);
+	cout<<"(outer.getInner_pointer())->getInnerData="<<(outer.getInner_pointer())->getInnerData()<<endl;
+	outer.setInnerData(200);
+	cout<<"(outer.getInner_quote()).getInnerData="<<(outer.getInner_quote()).getInnerData()<<endl;
+
+	(outer.getInner_pointer())->setInnerData(333);
+	cout<<"outer.getInnerData="<<outer.getInnerData()<<endl;
+	(outer.getInner_quote()).setInnerData(444);
+	cout<<"outer.getInnerData="<<outer.getInnerData()<<endl;
+	
+	cout<<"end of test \n\n\n"<<endl;
 	cout<<"testing & *"<<endl;
 	int a = 0;
 	func1(a);
