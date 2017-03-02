@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include "ACLRuleManager.hpp"
+#include "CommonFunc.hpp"
 
 using namespace std;
 

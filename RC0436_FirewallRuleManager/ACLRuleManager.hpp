@@ -1,3 +1,7 @@
+
+#ifndef ACL_RULE_MANAGER_HPP_
+#define ACL_RULE_MANAGER_HPP_
+
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -25,9 +29,6 @@ struct ACLRule
 	vector<int> ruleIndexList; 
 };
 
-void printVector(vector<int> v);
-void printVectorVector(vector<vector<int> > v);
-void printACLRuleList(vector<ACLRule>  ruleList);
 bool compare(int a, int b);
 
 
@@ -36,7 +37,7 @@ class ACLRuleManager
 {
 public:
 	ACLRuleManager():indexList(3){}
-	bool ACLRuleManager::addPoolIndex(ACLChainType chainType, int indexNumber2Add, vector<int> &indexList2Add);
+	bool addPoolIndex(ACLChainType chainType, int indexNumber2Add, vector<int> &indexList2Add);
 	bool delPoolIndex(ACLChainType chainType, int indexNumber2Del, vector<int> indexList2Del);
     bool findPoolIndex(ACLChainType chainType, int indexNumber2Find, vector<int> indexList2Find, vector<int> &indexPosListFound);
     bool addACLRule(ACLRule &rule, int indexNumber2Add);
@@ -51,3 +52,4 @@ public:
 	vector<vector<int> > indexList; /* 3 index list corresponding to input, output dscp and output others */
 };
 
+#endif
