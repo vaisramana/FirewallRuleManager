@@ -4,5 +4,5 @@ main.o : main.cpp
 	g++ -c main.cpp -std=c++11
 CommonFunc.o : CommonFunc.cpp CommonFunc.hpp
 	g++ -c CommonFunc.cpp -std=c++11
-ACLRuleManager.o : ACLRuleManager.cpp ACLRuleManager.hpp
+ACLRuleManager.o : ACLRuleManager.cpp ACLRuleManager.hpp CommonFunc.hpp
 	g++ -c ACLRuleManager.cpp -std=c++11
