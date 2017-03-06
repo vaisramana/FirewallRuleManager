@@ -5,7 +5,31 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <boost/optional.hpp>
+#include <boost/asio.hpp>
+#include "CommonFunc.hpp"
+
 using namespace std;
+using namespace boost;
+
+
+template <class T>
+using Optional = boost::optional<T>;
+
+template <class T>
+using In = const T&;
+
+template <class T>
+using Out = T&;
+
+template <class T> /**< Same C++ syntax as Out */
+using InOut = T&;
+
+
+
+using IndexList    = vector<int>;
+using IpAddress    = asio::ip::address;
+
 
 #define ACL_CHAIN_INDEX_RANGE (10000)
 #define ACL_CHAIN_INDEX_MIN (3000)
@@ -19,9 +43,19 @@ using namespace std;
 #define ACL_CHAIN_INDEX_MAX (ACL_INPUT_CHAIN_INDEX_MAX+ACL_CHAIN_INDEX_MARGIN)
 
 
+
+struct PortRange
+{
+    int lowValue;
+    int highValue;
+};
+
+using PortRanges = vector<PortRange>;
+
+
 typedef enum{
    Input,
-   OuputDscp,
+   OutputDscp,
    //OutputOthers,
    /*new type should be added above this line*/
    endOfAclChainType
@@ -29,8 +63,22 @@ typedef enum{
 
 //#define IndexList (vector<int>)
 
+struct Rule
+{
+    int flowType;
+    optional<int> transportNetworkType;
+    optional<int> precedence;
+    optional<IpAddress> srcIp;
+    optional<int> srcPrefixLength;
+    optional<PortRanges> srcPortRanges;
+    optional<IpAddress> dstIp;
+    optional<int> dstPrefixLength;
+    optional<PortRanges> dstPortRanges;
+};
 
 
+
+#if 0
 struct ACLRule
 {
     ACLChainType chainType;
@@ -38,10 +86,15 @@ struct ACLRule
     int dscp;
     vector<int> ruleIndexList; 
 };
+#endif
 
-
-
-bool isless(const int & a, const int & b);
+struct ACLRule
+{
+    ACLChainType chainType;
+    Rule rule;
+    int dscp;
+    IndexList ruleIndexList; 
+};
 
 
 
@@ -50,18 +103,18 @@ class ACLRuleManager
 {
 public:
     ACLRuleManager():indexPool(2){}
-    bool addACLRule(ACLRule & rule, const int & indexNumberToAdd);
-    bool delACLRule(ACLRule & rule);
-    bool getACLRulePositionByRule(ACLRule & rule, int & pos);
-    bool compareACLRule(const ACLRule & rule1, const ACLRule & rule2);
-    bool getFreePoolIndex(const ACLChainType & chainType, const int & indexNumberToAdd, vector<int> & indexListToAdd);
-    bool delPoolIndex(const ACLChainType & chainType, const vector<int> & indexListToDel);
-    bool getIndexMinMax(const ACLChainType & chainType, int & indexMin, int & indexMax);
-    bool getIndexList(const ACLChainType & chainType, vector<int> **indexListPtrPtr);
-    bool findIndexPositionFromPool(const ACLChainType & chainType, const vector<int> & indexListToFind, vector<int> & indexPosListFound);
+    bool addACLRule(InOut<ACLRule> rule, In<int> indexNumberToAdd);
+    bool delACLRule(InOut<ACLRule> rule);
+    bool getACLRulePositionByRule(InOut<ACLRule> rule, Out<int> pos);
+    bool compareACLRule(In<ACLRule> rule1, In<ACLRule> rule2);
+    bool getFreePoolIndex(In<ACLChainType> chainType, In<int> indexNumberToAdd, Out<IndexList> indexListToAdd);
+    bool delPoolIndex(In<ACLChainType> chainType, In<IndexList> indexListToDel);
+    bool getIndexMinMax(In<ACLChainType> chainType, Out<int> indexMin, Out<int> indexMax);
+    bool getIndexList(In<ACLChainType> chainType, IndexList **indexListPtrPtr);
+    bool findIndexPositionFromPool(In<ACLChainType> chainType, In<IndexList> indexListToFind, Out<IndexList> indexPosListFound);
          
     vector<ACLRule> ruleList;
-    vector<vector<int> > indexPool; /* 2 index list corresponding to input, output dscp and output others */
+    vector<IndexList > indexPool; /* 2 index list corresponding to input, output dscp and output others */
 };
 
 #endif

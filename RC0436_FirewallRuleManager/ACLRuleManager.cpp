@@ -10,14 +10,20 @@ using namespace std;
 
 
 
-    bool isless(const int & a, const int & b)
+    bool islessOwn(In<int> a, In<int> b)
     {
         return (a < b);
     }
    
-
-
-    bool ACLRuleManager::getIndexList(const ACLChainType & chainType, vector<int> **indexListPtrPtr)
+   
+   /**
+     *
+     * @brief get index list according to chain type
+     *
+     * @details return failure if:\n
+     *  - input chainType is invalid
+     */
+    bool ACLRuleManager::getIndexList(In<ACLChainType> chainType, IndexList **indexListPtrPtr)
     {
 
         if(chainType >= endOfAclChainType)
@@ -28,8 +34,16 @@ using namespace std;
         (*indexListPtrPtr) = &indexPool[static_cast<int>(chainType)];
         return true;
     }
-
-    bool ACLRuleManager::getIndexMinMax(const ACLChainType & chainType, int & indexMin, int & indexMax)
+    
+    
+    /**
+      *
+      * @brief get index max and min value according to chain type
+      *
+      * @details return failure if:\n
+      *  - input chainType is invalid
+      */
+    bool ACLRuleManager::getIndexMinMax(In<ACLChainType> chainType, Out<int> indexMin, Out<int> indexMax)
     {
         if(chainType >= endOfAclChainType)
         {
@@ -37,7 +51,7 @@ using namespace std;
             return false;
         }
 
-        if(OuputDscp == chainType)
+        if(OutputDscp == chainType)
         {
             indexMax = ACL_OUTPUT_CHAIN_DSCP_INDEX_MAX;
             indexMin = ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN;
@@ -56,12 +70,21 @@ using namespace std;
         return true;
     }
    
-   
-    bool ACLRuleManager::findIndexPositionFromPool(const ACLChainType & chainType, const vector<int> & indexListToFind, vector<int> & indexPosListFound)
+   /**
+     *
+     * @brief find given index from index list
+     *
+     * @details return found index list in indexPosListFound, return failure if:\n
+     *  - input chainType is invalid
+     *  - input chainType is not empty
+     * -  input indexListToFind is empty
+     * -  input indexNumberToFind is greater than current size
+     */
+    bool ACLRuleManager::findIndexPositionFromPool(In<ACLChainType> chainType, In<IndexList> indexListToFind, Out<IndexList> indexPosListFound)
     {
 
-        vector<int> *indexListPtr;
-        vector<int>::iterator iter;
+        IndexList *indexListPtr;
+        IndexList::iterator iter;
         int indexMax,indexMin;
         int i,pos;
         int indexNumberToFind = indexListToFind.size();
@@ -108,22 +131,22 @@ using namespace std;
         else
         {
             /*ascending sorted for further deletion*/
-            sort(indexPosListFound.begin(),indexPosListFound.end(),isless);
+            sort(indexPosListFound.begin(),indexPosListFound.end(),islessOwn);
             return true;
         }
     }
    
    
-    bool ACLRuleManager::delPoolIndex(const ACLChainType & chainType, const vector<int> & indexListToDel)
+    bool ACLRuleManager::delPoolIndex(In<ACLChainType> chainType, In<IndexList> indexListToDel)
     {
-        vector<int> * indexListPtr;
-        vector<int>::iterator iter;
+        IndexList * indexListPtr;
+        IndexList::iterator iter;
         int i,numOfRuleFound =0;
-        vector<int> indexPosListFound;
+        IndexList indexPosListFound;
 
         if(false == getIndexList(chainType,&indexListPtr))
         {
-            cout<<"ERR|getIndexList failure:"<<endl;
+            //cout<<"ERR|getIndexList failure:"<<endl;
             return false;
         }
 
@@ -139,16 +162,24 @@ using namespace std;
         }
         else
         {
-            cout<<"ERR|delPoolIndex failure:"<<endl;
+            //cout<<"ERR|findPoolIndex failure:"<<endl;
             return false;
         }
     }
-   
-   
-    bool ACLRuleManager::getFreePoolIndex(const ACLChainType & chainType, const int & indexNumberToAdd, vector<int> & indexListToAdd)
+    
+    /**
+      *
+      * @brief find given number of free index
+      *
+      * @details return index list in indexListToAdd, in case of:\n
+      *  - the first addtion, reserve index from head
+      *  - gap in current list is large enough, reserve from gap
+      *  - gap in current list is not large enough, reserve from tail\n
+      */
+    bool ACLRuleManager::getFreePoolIndex(In<ACLChainType> chainType, In<int> indexNumberToAdd, Out<IndexList> indexListToAdd)
     {
-        vector<int> * indexListPtr;
-        vector<int>::iterator iter;
+        IndexList * indexListPtr;
+        IndexList::iterator iter;
         int indexMax,indexMin;
         int i,j,lastIndex;
    
@@ -160,13 +191,13 @@ using namespace std;
         if(false == getIndexList(chainType,&indexListPtr) || 
            (0 == indexNumberToAdd))
         {
-            cout<<"ERR|chainType:"<<chainType<<" indexNumberToAdd:"<<indexNumberToAdd<<endl;
+            //cout<<"ERR|chainType:"<<chainType<<" indexNumber:"<<indexNumber2Add<<endl;
             return false;
         }
 
         if(((*indexListPtr).size()+indexNumberToAdd)>(indexMax - indexMin))
         {
-            cout<<"ERR|curSize:"<<(*indexListPtr).size()<<" indexNumberToAdd:"<<indexNumberToAdd<<" indexMax:"<<indexMax<<" indexMin:"<<indexMin<<endl;
+            //cout<<"ERR|curSize:"<<(*indexListPtr).size()<<" indexNumber:"<<indexNumber2Add<<" indexMax:"<<indexMax<<" indexMin:"<<indexMin<<endl;
             return false;
         }
 
@@ -222,9 +253,14 @@ using namespace std;
     }
    
    
-   
-   
-    bool ACLRuleManager::addACLRule(ACLRule & rule, const int & indexNumberToAdd)
+   /**
+     *
+     * @brief add one ACL rule
+     *
+     * @details add one ACL rules with given index number and index list will be retured in rule.ruleIndexList, addition failure occurs if\n
+     *  - remain free index number is smaller than given index number\n
+     */
+    bool ACLRuleManager::addACLRule(InOut<ACLRule> rule, In<int> indexNumberToAdd)
     {
         if(0 == getFreePoolIndex(rule.chainType,indexNumberToAdd,rule.ruleIndexList))
         {
@@ -236,6 +272,7 @@ using namespace std;
         return true;
     }
 
+#if 0
     bool ACLRuleManager::compareACLRule(const ACLRule & aclRule1, const ACLRule & aclRule2)
     {
         int i;
@@ -247,10 +284,97 @@ using namespace std;
         }
         return false;
     }
+#endif
+    bool ACLRuleManager::compareACLRule(In<ACLRule> aclRule1, In<ACLRule> aclRule2)
+    {
+        int i;
+        Rule rule1,rule2;
+        PortRanges portRanges1,portRanges2;
+        PortRange portRange1,portRange2;
+        
+        
+        if(aclRule1.chainType != aclRule2.chainType)
+        {
+            return false;
+        }
+        
+        if(OutputDscp == aclRule1.chainType)
+        {
+            if(aclRule1.dscp == aclRule2.dscp)
+            {
+                return true;
+            }
+        }
+        else
+        {
+            rule1 = aclRule1.rule;
+            rule2 = aclRule2.rule;
+            if((rule1.transportNetworkType == rule2.transportNetworkType)&&
+                (rule1.precedence == rule2.precedence)&&
+                (rule1.srcIp == rule2.srcIp)&&
+                (rule1.srcPrefixLength == rule2.srcPrefixLength)&&
+                (rule1.dstIp == rule2.dstIp)&&
+                (rule1.dstPrefixLength == rule2.dstPrefixLength))
+            {
+                /*check srcPortRanges*/
+                if ((rule1.srcPortRanges.is_initialized())^(rule2.srcPortRanges.is_initialized()))
+                {
+                    /*either one is non-initialized*/
+                    return false;
+                }
+                else if((rule1.srcPortRanges.is_initialized())&(rule2.srcPortRanges.is_initialized()))
+                {
+                    /*both two are initialized*/
+                    portRanges1 = rule1.srcPortRanges.get();
+                    portRanges2 = rule2.srcPortRanges.get();
+                    /*
+                    cout<<"portRanges1[0].lowValue:"<<portRanges1[0].lowValue<<" "
+                        <<"portRanges2[0].lowValue:"<<portRanges2[0].lowValue<<" "
+                        <<"portRanges1[0].highValue:"<<portRanges1[0].highValue<<" "
+                        <<"portRanges2[0].highValue:"<<portRanges2[0].highValue<<endl;*/
+                    if((portRanges1[0].lowValue != portRanges2[0].lowValue)||
+                        (portRanges1[0].highValue != portRanges2[0].highValue))
+                    {
+                        return false;
+                    }
+                }
+                /*else both two are non-initialized, check pass*/
 
+
+                /*check dstPortRanges*/
+                if ((rule1.dstPortRanges.is_initialized())^(rule2.dstPortRanges.is_initialized()))
+                {
+                    /*either one is non-initialized*/
+                    return false;
+                }
+                else if((rule1.dstPortRanges.is_initialized())&(rule2.dstPortRanges.is_initialized()))
+                {
+                    /*both two are initialized*/
+                    portRanges1 = rule1.dstPortRanges.get();
+                    portRanges2 = rule2.dstPortRanges.get();
+                    if((portRanges1[0].lowValue != portRanges2[0].lowValue)||
+                        (portRanges1[0].highValue != portRanges2[0].highValue))
+                    {
+                        return false;
+                    }
+                }
+                /*else both two are non-initialized, check pass*/
+                //cout<<"DBG input chain match"<<endl;
+                /*cout<<"rule1.srcPortRanges.is_initialized(): "<<rule1.srcPortRanges.is_initialized()<<" "
+                    <<"rule2.srcPortRanges.is_initialized(): "<<rule2.srcPortRanges.is_initialized()<<" "
+                    <<endl;*/
+                return true;
+            }
+        }
+        return false;
+    }
    
-   
-    bool ACLRuleManager::getACLRulePositionByRule(ACLRule & rule, int & pos)
+   /**
+     *
+     * @brief find rule position in rule database by given rule
+     *
+     */
+    bool ACLRuleManager::getACLRulePositionByRule(InOut<ACLRule> rule, Out<int> pos)
     {
         std::vector<ACLRule>::iterator iter;
         int i;
@@ -267,24 +391,31 @@ using namespace std;
         return false;
     }
    
-   
-    bool ACLRuleManager::delACLRule(ACLRule & rule)
+   /**
+     *
+     * @brief delete one ACL rule
+     *
+     * @details delete one ACL rule and index list will be retured in rule.ruleIndexList, deletion failure occurs if\n
+     *  - given rule is not found in rule database\n
+     *  - index list along with rule is not found in index database\n
+     */
+    bool ACLRuleManager::delACLRule(InOut<ACLRule> rule)
     {
         std::vector<ACLRule>::iterator iter;
         int numOfRuleFound = 0;
-        vector<int> indexPosListFound;
+        IndexList indexPosListFound;
         int rulePos;
 
         if(false == getACLRulePositionByRule(rule, rulePos))
         {
-            cout<<"ERR|getACLRulePositionByRule failure"<<endl;
+            //cout<<"ERR|findACLRule failure"<<endl;
             return false;
         }
 
         /*rule.ruleIndexList is asigned in getACLRulePositionByRule()*/
         if(false == findIndexPositionFromPool(rule.chainType, rule.ruleIndexList, indexPosListFound))
         {
-            cout<<"ERR|findIndexPositionFromPool failure"<<endl;
+            //cout<<"ERR|findPoolIndex failure"<<endl;
             return false;
         }
         /*delete index*/

@@ -24,7 +24,7 @@ void test1(vector<int> v)
         }
     }
     cout<<endl;
-    printVector(v);
+    //printVector(v);
     cout<<"end of test1"<<endl;
 }
 
@@ -273,9 +273,8 @@ void testcase_rule_1()
     cout<<"START testcase_rule_1: ";
     cout<<"add two rules"<<endl;
 
-    aclRule.chainType = OuputDscp;
+    aclRule.chainType = OutputDscp;
     aclRule.dscp = 1;
-    aclRule.rule = 1;
     result = rulemanager.addACLRule(aclRule,2);
     assert(true == result);
     assert(2 == aclRule.ruleIndexList.size());
@@ -284,12 +283,10 @@ void testcase_rule_1()
     assert(2 == rulemanager.indexPool[1].size());
     assert(ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN == rulemanager.indexPool[1][0]);
     assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+1) == rulemanager.indexPool[1][1]);
-    assert(OuputDscp == rulemanager.ruleList[0].chainType);
+    assert(OutputDscp == rulemanager.ruleList[0].chainType);
     assert(1 == rulemanager.ruleList[0].dscp);
-    assert(1 == rulemanager.ruleList[0].rule);
     
     aclRule.dscp = 2;
-    aclRule.rule = 2;
     result = rulemanager.addACLRule(aclRule,2);
     assert(2 == aclRule.ruleIndexList.size());
     assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+2) == aclRule.ruleIndexList[0]);
@@ -299,12 +296,10 @@ void testcase_rule_1()
     assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+1) == rulemanager.indexPool[1][1]);
     assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+2) == rulemanager.indexPool[1][2]);
     assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+3) == rulemanager.indexPool[1][3]);
-    assert(OuputDscp == rulemanager.ruleList[0].chainType);
+    assert(OutputDscp == rulemanager.ruleList[0].chainType);
     assert(1 == rulemanager.ruleList[0].dscp);
-    assert(1 == rulemanager.ruleList[0].rule);
-    assert(OuputDscp == rulemanager.ruleList[1].chainType);
+    assert(OutputDscp == rulemanager.ruleList[1].chainType);
     assert(2 == rulemanager.ruleList[1].dscp);
-    assert(2 == rulemanager.ruleList[1].rule);
     cout<<"PASS testcase_rule_1"<<endl;
 }
 
@@ -319,7 +314,6 @@ void testcase_rule_2()
 
     aclRule.chainType = endOfAclChainType;
     aclRule.dscp = 1;
-    aclRule.rule = 1;
     result = rulemanager.addACLRule(aclRule,2);
     assert(false == result);
     assert(true == aclRule.ruleIndexList.empty());
@@ -338,9 +332,8 @@ void testcase_rule_3()
     cout<<"START testcase_rule_3: ";
     cout<<"fail to add rules with invalid index number"<<endl;
 
-    aclRule.chainType = OuputDscp;
+    aclRule.chainType = OutputDscp;
     aclRule.dscp = 1;
-    aclRule.rule = 1;
     result = rulemanager.addACLRule(aclRule,ACL_CHAIN_INDEX_RANGE+1);
     assert(false == result);
     assert(true == aclRule.ruleIndexList.empty());
@@ -359,9 +352,8 @@ void testcase_rule_4()
     cout<<"START testcase_rule_4: ";
     cout<<"delete one rule"<<endl;
 
-    aclRule.chainType = OuputDscp;
+    aclRule.chainType = OutputDscp;
     aclRule.dscp = 1;
-    aclRule.rule = 1;
     rulemanager.addACLRule(aclRule,2);
     vector <int>().swap(aclRule.ruleIndexList);
     result = rulemanager.delACLRule(aclRule);
@@ -385,9 +377,8 @@ void testcase_rule_5()
     cout<<"START testcase_rule_5: ";
     cout<<"fail to delete one rule with wrong chaintype"<<endl;
 
-    aclRule.chainType = OuputDscp;
+    aclRule.chainType = OutputDscp;
     aclRule.dscp = 1;
-    aclRule.rule = 1;
     rulemanager.addACLRule(aclRule,2);
     aclRule.chainType = Input;
     vector <int>().swap(aclRule.ruleIndexList);
@@ -396,9 +387,8 @@ void testcase_rule_5()
     assert(2 == rulemanager.indexPool[1].size());
     assert(ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN == rulemanager.indexPool[1][0]);
     assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+1) == rulemanager.indexPool[1][1]);
-    assert(OuputDscp == rulemanager.ruleList[0].chainType);
+    assert(OutputDscp == rulemanager.ruleList[0].chainType);
     assert(1 == rulemanager.ruleList[0].dscp);
-    assert(1 == rulemanager.ruleList[0].rule);
     
     cout<<"PASS testcase_rule_5"<<endl;
 }
@@ -411,9 +401,8 @@ void testcase_rule_6()
     cout<<"START testcase_rule_6: ";
     cout<<"fail to delete one rule with wrong dscp"<<endl;
 
-    aclRule.chainType = OuputDscp;
+    aclRule.chainType = OutputDscp;
     aclRule.dscp = 1;
-    aclRule.rule = 1;
     rulemanager.addACLRule(aclRule,2);
     aclRule.dscp = 2;
     vector <int>().swap(aclRule.ruleIndexList);
@@ -422,9 +411,8 @@ void testcase_rule_6()
     assert(2 == rulemanager.indexPool[1].size());
     assert(ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN == rulemanager.indexPool[1][0]);
     assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+1) == rulemanager.indexPool[1][1]);
-    assert(OuputDscp == rulemanager.ruleList[0].chainType);
+    assert(OutputDscp == rulemanager.ruleList[0].chainType);
     assert(1 == rulemanager.ruleList[0].dscp);
-    assert(1 == rulemanager.ruleList[0].rule);
     
     cout<<"PASS testcase_rule_6"<<endl;
 }
@@ -438,20 +426,19 @@ void testcase_rule_7()
     cout<<"START testcase_rule_7: ";
     cout<<"fail to delete one rule with wrong rule"<<endl;
 
-    aclRule.chainType = OuputDscp;
+    aclRule.chainType = Input;
     aclRule.dscp = 1;
-    aclRule.rule = 1;
     rulemanager.addACLRule(aclRule,2);
-    aclRule.rule = 2;
+    aclRule.rule.srcIp = IpAddress::from_string("192.168.255.1");
     vector <int>().swap(aclRule.ruleIndexList);
     result = rulemanager.delACLRule(aclRule);
     assert(false == result);
-    assert(2 == rulemanager.indexPool[1].size());
-    assert(ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN == rulemanager.indexPool[1][0]);
-    assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+1) == rulemanager.indexPool[1][1]);
-    assert(OuputDscp == rulemanager.ruleList[0].chainType);
+    assert(2 == rulemanager.indexPool[Input].size());
+    assert(ACL_INPUT_CHAIN_INDEX_MIN == rulemanager.indexPool[Input][0]);
+    assert((ACL_INPUT_CHAIN_INDEX_MIN+1) == rulemanager.indexPool[Input][1]);
+    assert(Input == rulemanager.ruleList[0].chainType);
     assert(1 == rulemanager.ruleList[0].dscp);
-    assert(1 == rulemanager.ruleList[0].rule);
+    assert(false == rulemanager.ruleList[0].rule.srcIp.is_initialized());
     
     cout<<"PASS testcase_rule_7"<<endl;
 }
@@ -464,24 +451,19 @@ void testcase_rule_8()
     cout<<"START testcase_rule_8: ";
     cout<<"add three rules, delete one, add one with index in the tail"<<endl;
 
-    aclRule.chainType = OuputDscp;
+    aclRule.chainType = OutputDscp;
     aclRule.dscp = 1;
-    aclRule.rule = 1;
     rulemanager.addACLRule(aclRule,3);
     aclRule.dscp = 2;
-    aclRule.rule = 2;
     rulemanager.addACLRule(aclRule,1);
     aclRule.dscp = 3;
-    aclRule.rule = 3;
     rulemanager.addACLRule(aclRule,2);
     /*indexPool: 0,1,2,3,4,5*/
     aclRule.dscp = 2;
-    aclRule.rule = 2;
     vector <int>().swap(aclRule.ruleIndexList);
     rulemanager.delACLRule(aclRule);
     /*indexPool: 0,1,2,4,5*/
     aclRule.dscp = 4;
-    aclRule.rule = 4;
     result = rulemanager.addACLRule(aclRule,2);
     /*indexPool: 0,1,2,4,5,6,7*/
     assert(2 == aclRule.ruleIndexList.size());
@@ -495,15 +477,12 @@ void testcase_rule_8()
     assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+5) == rulemanager.indexPool[1][4]);
     assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+6) == rulemanager.indexPool[1][5]);
     assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+7) == rulemanager.indexPool[1][6]);
-    assert(OuputDscp == rulemanager.ruleList[0].chainType);
+    assert(OutputDscp == rulemanager.ruleList[0].chainType);
     assert(1 == rulemanager.ruleList[0].dscp);
-    assert(1 == rulemanager.ruleList[0].rule);
-    assert(OuputDscp == rulemanager.ruleList[1].chainType);
+    assert(OutputDscp == rulemanager.ruleList[1].chainType);
     assert(3 == rulemanager.ruleList[1].dscp);
-    assert(3 == rulemanager.ruleList[1].rule);
-    assert(OuputDscp == rulemanager.ruleList[1].chainType);
+    assert(OutputDscp == rulemanager.ruleList[1].chainType);
     assert(4 == rulemanager.ruleList[2].dscp);
-    assert(4 == rulemanager.ruleList[2].rule);
     cout<<"PASS testcase_rule_8"<<endl;
 }
 
@@ -515,23 +494,18 @@ void testcase_rule_9()
     cout<<"START testcase_rule_9: ";
     cout<<"add three rules, delete one, add one with index in middle"<<endl;
 
-    aclRule.chainType = OuputDscp;
+    aclRule.chainType = OutputDscp;
     aclRule.dscp = 1;
-    aclRule.rule = 1;
     rulemanager.addACLRule(aclRule,3);
     aclRule.dscp = 2;
-    aclRule.rule = 2;
     rulemanager.addACLRule(aclRule,5);
     aclRule.dscp = 3;
-    aclRule.rule = 3;
     rulemanager.addACLRule(aclRule,2);
     /*indexPool: 0,1,2,3,4,5,6,7,8,9*/
     aclRule.dscp = 2;
-    aclRule.rule = 2;
     rulemanager.delACLRule(aclRule);
     /*indexPool: 0,1,2,8,9*/
     aclRule.dscp = 4;
-    aclRule.rule = 4;
     result = rulemanager.addACLRule(aclRule,3);
     /*indexPool: 0,1,2,3,4,5,8,9*/
     assert(3 == aclRule.ruleIndexList.size());
@@ -547,18 +521,394 @@ void testcase_rule_9()
     assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+5) == rulemanager.indexPool[1][5]);
     assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+8) == rulemanager.indexPool[1][6]);
     assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+9) == rulemanager.indexPool[1][7]);
-    assert(OuputDscp == rulemanager.ruleList[0].chainType);
+    assert(OutputDscp == rulemanager.ruleList[0].chainType);
     assert(1 == rulemanager.ruleList[0].dscp);
-    assert(1 == rulemanager.ruleList[0].rule);
-    assert(OuputDscp == rulemanager.ruleList[1].chainType);
+    assert(OutputDscp == rulemanager.ruleList[1].chainType);
     assert(3 == rulemanager.ruleList[1].dscp);
-    assert(3 == rulemanager.ruleList[1].rule);
-    assert(OuputDscp == rulemanager.ruleList[1].chainType);
+    assert(OutputDscp == rulemanager.ruleList[1].chainType);
     assert(4 == rulemanager.ruleList[2].dscp);
-    assert(4 == rulemanager.ruleList[2].rule);
     cout<<"PASS testcase_rule_9"<<endl;
 }
 
+
+
+void testcase_rule_10()
+{
+    ACLRuleManager rulemanager;
+    ACLRule aclRule;
+    bool result;
+    PortRange portRange;
+    PortRanges portRanges1,portRanges2;
+    cout<<"START testcase_rule_10: ";
+    cout<<"succeed to delete one rule with right rule"<<endl;
+
+    aclRule.chainType = Input;
+    /*set IP addresses*/
+    aclRule.rule.srcIp = IpAddress::from_string("192.168.255.1");
+    aclRule.rule.dstIp = IpAddress::from_string("192.168.255.3");
+    /*set src port*/
+    portRange.lowValue = 10;
+    portRange.highValue = 20;
+    portRanges1.push_back(portRange);
+    aclRule.rule.srcPortRanges = portRanges1;
+    /*set dst port*/
+    portRange.lowValue = 30;
+    portRange.highValue = 40;
+    portRanges2.push_back(portRange);
+    aclRule.rule.dstPortRanges = portRanges2;
+
+    aclRule.rule.transportNetworkType = 3;
+    aclRule.rule.precedence = 5;
+    aclRule.rule.srcPrefixLength = 24;
+    aclRule.rule.dstPrefixLength = 24;
+    
+    rulemanager.addACLRule(aclRule,2);
+    vector <int>().swap(aclRule.ruleIndexList);
+    result = rulemanager.delACLRule(aclRule);
+    assert(true == result);
+    assert(ACL_INPUT_CHAIN_INDEX_MIN == aclRule.ruleIndexList[0]);
+    assert((ACL_INPUT_CHAIN_INDEX_MIN+1) == aclRule.ruleIndexList[1]);
+    assert(true == rulemanager.indexPool[0].empty());
+    assert(true == rulemanager.indexPool[1].empty());
+    assert(true == rulemanager.ruleList.empty());
+    
+    cout<<"PASS testcase_rule_10"<<endl;
+}
+
+
+void testcase_rule_11()
+{
+    ACLRuleManager rulemanager;
+    ACLRule aclRule;
+    bool result;
+    PortRange portRange;
+    PortRanges portRanges1,portRanges2;
+    cout<<"START testcase_rule_11: ";
+    cout<<"fail to delete one rule with different port"<<endl;
+
+    aclRule.chainType = Input;
+    /*set IP addresses*/
+    aclRule.rule.srcIp = IpAddress::from_string("192.168.255.1");
+    aclRule.rule.dstIp = IpAddress::from_string("192.168.255.3");
+    /*set src port*/
+    portRange.lowValue = 10;
+    portRange.highValue = 20;
+    portRanges1.push_back(portRange);
+    aclRule.rule.srcPortRanges = portRanges1;
+    /*set dst port*/
+    portRange.lowValue = 30;
+    portRange.highValue = 40;
+    portRanges2.push_back(portRange);
+    aclRule.rule.dstPortRanges = portRanges2;
+
+    aclRule.rule.transportNetworkType = 3;
+    aclRule.rule.precedence = 5;
+    aclRule.rule.srcPrefixLength = 24;
+    aclRule.rule.dstPrefixLength = 24;
+    
+    rulemanager.addACLRule(aclRule,2);
+    vector <int>().swap(aclRule.ruleIndexList);
+    vector <PortRange>().swap(portRanges2);
+    /*modify port range*/
+    portRange.lowValue = 50;
+    portRange.highValue = 60;
+    portRanges2.push_back(portRange);
+    aclRule.rule.dstPortRanges = portRanges2;
+    result = rulemanager.delACLRule(aclRule);
+    assert(false == result);
+    assert(2 == rulemanager.indexPool[Input].size());
+    assert(ACL_INPUT_CHAIN_INDEX_MIN == rulemanager.indexPool[Input][0]);
+    assert((ACL_INPUT_CHAIN_INDEX_MIN+1) == rulemanager.indexPool[Input][1]);
+    assert(Input == rulemanager.ruleList[0].chainType);
+    assert(IpAddress::from_string("192.168.255.1") == rulemanager.ruleList[0].rule.srcIp.get());
+    assert(IpAddress::from_string("192.168.255.3") == rulemanager.ruleList[0].rule.dstIp.get());
+    assert(3 == rulemanager.ruleList[0].rule.transportNetworkType.get());
+    assert(5 == rulemanager.ruleList[0].rule.precedence.get());
+    assert(24 == rulemanager.ruleList[0].rule.srcPrefixLength.get());
+    assert(24 == rulemanager.ruleList[0].rule.dstPrefixLength.get());
+    assert(ACL_INPUT_CHAIN_INDEX_MIN == rulemanager.ruleList[0].ruleIndexList[0]);
+    assert((ACL_INPUT_CHAIN_INDEX_MIN+1) == rulemanager.ruleList[0].ruleIndexList[1]);
+    assert(10 == (rulemanager.ruleList[0].rule.srcPortRanges.get())[0].lowValue);
+    assert(20 == (rulemanager.ruleList[0].rule.srcPortRanges.get())[0].highValue);
+    assert(30 == (rulemanager.ruleList[0].rule.dstPortRanges.get())[0].lowValue);
+    assert(40 == (rulemanager.ruleList[0].rule.dstPortRanges.get())[0].highValue);
+    
+    cout<<"PASS testcase_rule_11"<<endl;
+}
+
+
+
+void testcase_compare_1()
+{
+    ACLRule aclRule1;
+    ACLRule aclRule2;
+    bool result;
+    ACLRuleManager ruleManager;
+
+    cout<<"START testcase_compare_1: ";
+    cout<<"different chain type"<<endl;
+    
+    aclRule1.chainType = OutputDscp;
+    aclRule1.dscp = 10;
+
+    aclRule2.chainType = Input;
+    aclRule2.dscp = 10;
+
+    result = ruleManager.compareACLRule(aclRule1,aclRule2);
+    assert(false == result);
+    cout<<"PASS testcase_compare_1"<<endl;
+}
+
+
+void testcase_compare_2()
+{
+    ACLRule aclRule1;
+    ACLRule aclRule2;
+    bool result;
+    ACLRuleManager ruleManager;
+
+    cout<<"START testcase_compare_2: ";
+    cout<<"OutputDscp identical"<<endl;
+    
+    aclRule1.chainType = OutputDscp;
+    aclRule1.dscp = 10;
+
+    aclRule2.chainType = OutputDscp;
+    aclRule2.dscp = 10;
+
+    result = ruleManager.compareACLRule(aclRule1,aclRule2);
+    assert(true == result);
+    cout<<"PASS testcase_compare_2"<<endl;
+}
+
+void testcase_compare_3()
+{
+    ACLRule aclRule1;
+    ACLRule aclRule2;
+    bool result;
+    ACLRuleManager ruleManager;
+
+    cout<<"START testcase_compare_3: ";
+    cout<<"Input chain with different transportNetworkType"<<endl;
+    
+    aclRule1.chainType = Input;
+    aclRule1.rule.transportNetworkType= 10;
+
+    aclRule2.chainType = Input;
+    aclRule2.rule.transportNetworkType= 11;
+
+    result = ruleManager.compareACLRule(aclRule1,aclRule2);
+    assert(false == result);
+    cout<<"PASS testcase_compare_3"<<endl;
+}
+
+void testcase_compare_4()
+{
+    ACLRule aclRule1;
+    ACLRule aclRule2;
+    bool result;
+    ACLRuleManager ruleManager;
+
+    cout<<"START testcase_compare_4: ";
+    cout<<"Input chain with rule is not initialized"<<endl;
+    
+    aclRule1.chainType = Input;
+
+    aclRule2.chainType = Input;
+
+    result = ruleManager.compareACLRule(aclRule1,aclRule2);
+    assert(true == result);
+    cout<<"PASS testcase_compare_4"<<endl;
+}
+
+
+void testcase_compare_5()
+{
+    ACLRule aclRule1;
+    ACLRule aclRule2;
+    bool result;
+    ACLRuleManager ruleManager;
+
+    cout<<"START testcase_compare_5: ";
+    cout<<"Input chain with different IP addresses"<<endl;
+    
+    aclRule1.chainType = Input;
+    aclRule1.rule.srcIp = IpAddress::from_string("192.168.255.1");
+
+    aclRule2.chainType = Input;
+    aclRule2.rule.srcIp = IpAddress::from_string("192.168.255.3");
+
+    result = ruleManager.compareACLRule(aclRule1,aclRule2);
+    assert(false == result);
+    cout<<"PASS testcase_compare_5"<<endl;
+}
+
+
+void testcase_compare_6()
+{
+    ACLRule aclRule1;
+    ACLRule aclRule2;
+    bool result;
+    ACLRuleManager ruleManager;
+
+    cout<<"START testcase_compare_6: ";
+    cout<<"Input chain with one of IP address not initialized"<<endl;
+    
+    aclRule1.chainType = Input;
+    aclRule1.rule.srcIp = IpAddress::from_string("192.168.255.1");
+
+    aclRule2.chainType = Input;
+
+    result = ruleManager.compareACLRule(aclRule1,aclRule2);
+    assert(false == result);
+    cout<<"PASS testcase_compare_6"<<endl;
+}
+
+void testcase_compare_7()
+{
+    ACLRule aclRule1;
+    ACLRule aclRule2;
+    bool result;
+    ACLRuleManager ruleManager;
+
+    cout<<"START testcase_compare_7: ";
+    cout<<"Input chain with identical IP addresses"<<endl;
+    
+    aclRule1.chainType = Input;
+    aclRule1.rule.srcIp = IpAddress::from_string("192.168.255.1");
+
+    aclRule2.chainType = Input;
+    aclRule2.rule.srcIp = IpAddress::from_string("192.168.255.1");
+
+    result = ruleManager.compareACLRule(aclRule1,aclRule2);
+    assert(true == result);
+    cout<<"PASS UT_casetestcase_compare_7_7"<<endl;
+}
+
+void testcase_compare_8()
+{
+    ACLRule aclRule1;
+    ACLRule aclRule2;
+    bool result;
+    PortRange portRange;
+    PortRanges portRanges1,portRanges2;
+    ACLRuleManager ruleManager;
+
+    cout<<"START testcase_compare_8: ";
+    cout<<"Input chain with identical IP addresses and port ranges"<<endl;
+    
+    aclRule1.chainType = Input;
+    aclRule1.rule.srcIp = IpAddress::from_string("192.168.255.1");
+    portRange.lowValue = 10;
+    portRange.highValue = 20;
+    portRanges1.push_back(portRange);
+    aclRule1.rule.srcPortRanges = portRanges1;
+
+    aclRule2.chainType = Input;
+    aclRule2.rule.srcIp = IpAddress::from_string("192.168.255.1");
+    portRange.lowValue = 10;
+    portRange.highValue = 20;
+    portRanges2.push_back(portRange);
+    aclRule2.rule.srcPortRanges = portRanges2;
+
+    result = ruleManager.compareACLRule(aclRule1,aclRule2);
+    assert(true == result);
+    cout<<"PASS testcase_compare_8"<<endl;
+}
+
+void testcase_compare_9()
+{
+    ACLRule aclRule1;
+    ACLRule aclRule2;
+    bool result;
+    PortRange portRange;
+    PortRanges portRanges1,portRanges2;
+    ACLRuleManager ruleManager;
+
+    cout<<"START testcase_compare_9: ";
+    cout<<"Input chain with identical IP addresses and different port ranges"<<endl;
+    
+    aclRule1.chainType = Input;
+    aclRule1.rule.srcIp = IpAddress::from_string("192.168.255.1");
+    portRange.lowValue = 10;
+    portRange.highValue = 20;
+    portRanges1.push_back(portRange);
+    aclRule1.rule.srcPortRanges = portRanges1;
+
+    aclRule2.chainType = Input;
+    aclRule2.rule.srcIp = IpAddress::from_string("192.168.255.1");
+    portRange.lowValue = 10;
+    portRange.highValue = 30;
+    portRanges2.push_back(portRange);
+    aclRule2.rule.srcPortRanges = portRanges2;
+
+    result = ruleManager.compareACLRule(aclRule1,aclRule2);
+    assert(false == result);
+    cout<<"PASS testcase_compare_9"<<endl;
+}
+
+
+
+void testcase_compare_10()
+{
+    ACLRule aclRule1;
+    ACLRule aclRule2;
+    bool result;
+    PortRange portRange;
+    PortRanges portRanges1,portRanges2;
+    ACLRuleManager ruleManager;
+
+    cout<<"START testcase_compare_10: ";
+    cout<<"Input chain with one port ranges not initialized"<<endl;
+    
+    aclRule1.chainType = Input;
+    aclRule1.rule.srcIp = IpAddress::from_string("192.168.255.1");
+    portRange.lowValue = 10;
+    portRange.highValue = 20;
+    portRanges1.push_back(portRange);
+    aclRule1.rule.srcPortRanges = portRanges1;
+
+    aclRule2.chainType = Input;
+    aclRule2.rule.srcIp = IpAddress::from_string("192.168.255.1");
+
+    result = ruleManager.compareACLRule(aclRule1,aclRule2);
+    assert(false == result);
+    cout<<"PASS testcase_compare_10"<<endl;
+}
+
+
+
+
+void testcase_compare_11()
+{
+    ACLRule aclRule1;
+    ACLRule aclRule2;
+    bool result;
+    PortRange portRange;
+    PortRanges portRanges1,portRanges2;
+    ACLRuleManager ruleManager;
+
+    cout<<"START testcase_compare_11: ";
+    cout<<"Input chain with identical src IP addresses and dst port ranges"<<endl;
+    
+    aclRule1.chainType = Input;
+    aclRule1.rule.srcIp = IpAddress::from_string("192.168.255.1");
+    portRange.lowValue = 10;
+    portRange.highValue = 20;
+    portRanges1.push_back(portRange);
+    aclRule1.rule.dstPortRanges = portRanges1;
+
+    aclRule2.chainType = Input;
+    aclRule2.rule.srcIp = IpAddress::from_string("192.168.255.1");
+    portRange.lowValue = 10;
+    portRange.highValue = 20;
+    portRanges2.push_back(portRange);
+    aclRule2.rule.dstPortRanges = portRanges2;
+
+    result = ruleManager.compareACLRule(aclRule1,aclRule2);
+    assert(true == result);
+    cout<<"PASS testcase_compare_11"<<endl;
+}
 
 
 
@@ -580,6 +930,19 @@ int main()
     testcase_rule_7();
     testcase_rule_8();
     testcase_rule_9();
+    testcase_rule_10();
+    testcase_rule_11();
+    testcase_compare_1();
+    testcase_compare_2();
+    testcase_compare_3();
+    testcase_compare_4();
+    testcase_compare_5();
+    testcase_compare_6();
+    testcase_compare_7();
+    testcase_compare_8();
+    testcase_compare_9();
+    testcase_compare_10();
+    testcase_compare_11();
     cout<<"ALL CASES PASSED"<<endl;
 #if 0
     cout<<"main"<<endl;

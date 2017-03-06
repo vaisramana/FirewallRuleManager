@@ -1,8 +1,8 @@
 ﻿run : main.o ACLRuleManager.o CommonFunc.o
-	gcc -o run main.o ACLRuleManager.o CommonFunc.o -lstdc++ -std=c++11
+	g++ -o run main.o ACLRuleManager.o CommonFunc.o -std=c++11 -lboost_system
 main.o : main.cpp
-	gcc -c main.cpp
+	g++ -c main.cpp -std=c++11
 CommonFunc.o : CommonFunc.cpp CommonFunc.hpp
-	gcc -c CommonFunc.cpp
+	g++ -c CommonFunc.cpp -std=c++11
 ACLRuleManager.o : ACLRuleManager.cpp ACLRuleManager.hpp
-	gcc -c ACLRuleManager.cpp
+	g++ -c ACLRuleManager.cpp -std=c++11
