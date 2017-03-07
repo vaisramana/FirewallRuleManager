@@ -8,10 +8,6 @@
 
 using namespace std;
 
-
-
-
-
 void test1(vector<int> v)
 {
     cout<<"test1"<<endl;
