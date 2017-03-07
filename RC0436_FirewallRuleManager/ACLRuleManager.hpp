@@ -26,6 +26,7 @@ public:
     bool getIndexMinMax(In<ACLChainType> chainType, Out<int> indexMin, Out<int> indexMax);
     bool getIndexList(In<ACLChainType> chainType, IndexList **indexListPtrPtr);
     bool findIndexPositionFromPool(In<ACLChainType> chainType, In<IndexList> indexListToFind, Out<IndexList> indexPosListFound);
+    bool getRuleListByFlowtype(In<FlowType> flowType, Out<std::vector<ACLRule> > foundRuleList);
          
     vector<ACLRule> ruleList;
     vector<IndexList > indexPool; /* 2 index list corresponding to input, output dscp and output others */

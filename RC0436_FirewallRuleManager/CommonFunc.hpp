@@ -47,6 +47,37 @@ using IpAddress    = asio::ip::address;
 #define ACL_INPUT_CHAIN_INDEX_MAX (ACL_INPUT_CHAIN_INDEX_MIN+ACL_CHAIN_INDEX_RANGE)
 #define ACL_CHAIN_INDEX_MAX (ACL_INPUT_CHAIN_INDEX_MAX+ACL_CHAIN_INDEX_MARGIN)
 
+enum class FlowType
+{
+    Bfd,
+    CmpCrl,
+    Dns,
+    Icmp,
+    IcmpEchoResponse,
+    Igmp,
+    Ike,
+    IpSec,
+    Mplane,
+    Ntp,
+    RndPort,
+    SecurityOverEthernet,
+    SiteSupportEquipment,
+    Ssh,
+    Syslog,
+    Top,
+    TwampReflector,
+    TwampSender,
+    LteCplane,
+    LteUplane,
+    WcdmaCplane,
+    WcdmaSmallIp,
+    WcdmaUplane,
+    GsmCplane,
+    GsmE2eDelayMeasurememt,
+    GsmMplane,
+    GsmUcsplane,
+    GsmUpsplane
+};
 
 
 struct PortRange
@@ -69,7 +100,7 @@ typedef enum{
 
 struct Rule
 {
-    int flowType;
+    FlowType flowType;
     optional<int> transportNetworkType;
     optional<int> precedence;
     optional<IpAddress> srcIp;
