@@ -2,8 +2,9 @@
 #include <vector>
 #include <algorithm>
 #include <assert.h>
-#include "ACLRuleManager.hpp"
 #include "CommonFunc.hpp"
+#include "ACLRuleManager.hpp"
+
 
 using namespace std;
 
@@ -104,12 +105,15 @@ void testcase_index_1()
 
     cout<<"START testcase_index_1: ";
     cout<<"get index from beginning"<<endl;
+    /*output vector is not clean*/
+    v.push_back(ACL_INPUT_CHAIN_INDEX_MIN+10);
     result = rulemanager.getFreePoolIndex(Input,4,v);
     assert(true == result);
-    assert(v[0]==ACL_INPUT_CHAIN_INDEX_MIN);
-    assert(v[1]==(ACL_INPUT_CHAIN_INDEX_MIN+1));
-    assert(v[2]==(ACL_INPUT_CHAIN_INDEX_MIN+2));
-    assert(v[3]==(ACL_INPUT_CHAIN_INDEX_MIN+3));
+    assert(4 == v.size());
+    assert(ACL_INPUT_CHAIN_INDEX_MIN == v[0]);
+    assert((ACL_INPUT_CHAIN_INDEX_MIN+1) == v[1]);
+    assert((ACL_INPUT_CHAIN_INDEX_MIN+2) == v[2]);
+    assert((ACL_INPUT_CHAIN_INDEX_MIN+3) == v[3]);
     cout<<"PASS testcase_index_1"<<endl;
 }
 
@@ -354,8 +358,11 @@ void testcase_rule_4()
 
     aclRule.chainType = OutputDscp;
     aclRule.dscp = 1;
+    aclRule.rule.flowType = FlowType::WcdmaCplane;
     rulemanager.addACLRule(aclRule,2);
-    vector <int>().swap(aclRule.ruleIndexList);
+    /*output aclRule.ruleIndexList is not clean*/
+    //vector <int>().swap(aclRule.ruleIndexList);
+    aclRule.ruleIndexList.push_back(ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+10);
     result = rulemanager.delACLRule(aclRule);
     assert(true == result);
     assert(2 == aclRule.ruleIndexList.size());
@@ -405,7 +412,7 @@ void testcase_rule_6()
     aclRule.dscp = 1;
     rulemanager.addACLRule(aclRule,2);
     aclRule.dscp = 2;
-    vector <int>().swap(aclRule.ruleIndexList);
+    //vector <int>().swap(aclRule.ruleIndexList);
     result = rulemanager.delACLRule(aclRule);
     assert(false == result);
     assert(2 == rulemanager.indexPool[1].size());
@@ -430,7 +437,7 @@ void testcase_rule_7()
     aclRule.dscp = 1;
     rulemanager.addACLRule(aclRule,2);
     aclRule.rule.srcIp = IpAddress::from_string("192.168.255.1");
-    vector <int>().swap(aclRule.ruleIndexList);
+    //vector <int>().swap(aclRule.ruleIndexList);
     result = rulemanager.delACLRule(aclRule);
     assert(false == result);
     assert(2 == rulemanager.indexPool[Input].size());
@@ -460,7 +467,7 @@ void testcase_rule_8()
     rulemanager.addACLRule(aclRule,2);
     /*indexPool: 0,1,2,3,4,5*/
     aclRule.dscp = 2;
-    vector <int>().swap(aclRule.ruleIndexList);
+    //vector <int>().swap(aclRule.ruleIndexList);
     rulemanager.delACLRule(aclRule);
     /*indexPool: 0,1,2,4,5*/
     aclRule.dscp = 4;
@@ -563,7 +570,7 @@ void testcase_rule_10()
     aclRule.rule.dstPrefixLength = 24;
     
     rulemanager.addACLRule(aclRule,2);
-    vector <int>().swap(aclRule.ruleIndexList);
+    //vector <int>().swap(aclRule.ruleIndexList);
     result = rulemanager.delACLRule(aclRule);
     assert(true == result);
     assert(ACL_INPUT_CHAIN_INDEX_MIN == aclRule.ruleIndexList[0]);
@@ -636,6 +643,150 @@ void testcase_rule_11()
     cout<<"PASS testcase_rule_11"<<endl;
 }
 
+void testcase_rule_12()
+{
+    ACLRuleManager rulemanager;
+    bool result;
+    vector < ACLRule > foundRuleList;
+    ACLRule aclRule;
+    
+    cout<<"START testcase_rule_12: ";
+    cout<<"test getRuleListByChainType() while list is empty"<<endl;
+
+    aclRule.chainType = OutputDscp;
+    aclRule.dscp = 10;
+    aclRule.rule.flowType = FlowType::WcdmaCplane;
+    foundRuleList.push_back(aclRule);
+    aclRule.chainType = Input;
+    foundRuleList.push_back(aclRule);
+    result = rulemanager.getRuleListByFlowtype(FlowType::Ssh,foundRuleList);
+
+    assert(true == result);
+    assert(true == foundRuleList.empty());
+    assert(0 == foundRuleList.size());
+    cout<<"PASS testcase_rule_12"<<endl;
+}
+
+void testcase_rule_13()
+{
+    ACLRuleManager rulemanager;
+    ACLRule aclRule,aclRuleOutput;
+    bool result;
+    PortRange portRange;
+    PortRanges portRanges1,portRanges2;
+    vector < ACLRule > foundRuleList;
+    cout<<"START testcase_rule_13: ";
+    cout<<"test getRuleListByChainType()"<<endl;
+
+    
+    
+    aclRule.chainType = Input;
+    /*set IP addresses*/
+    aclRule.rule.flowType = FlowType::WcdmaUplane;
+    aclRule.rule.srcIp = IpAddress::from_string("192.168.255.1");
+    aclRule.rule.dstIp = IpAddress::from_string("192.168.255.3");
+    /*set src port*/
+    portRange.lowValue = 10;
+    portRange.highValue = 20;
+    portRanges1.push_back(portRange);
+    aclRule.rule.srcPortRanges = portRanges1;
+    /*set dst port*/
+    portRange.lowValue = 30;
+    portRange.highValue = 40;
+    portRanges2.push_back(portRange);
+    aclRule.rule.dstPortRanges = portRanges2;
+
+    aclRule.rule.transportNetworkType = 3;
+    aclRule.rule.precedence = 5;
+    aclRule.rule.srcPrefixLength = 24;
+    aclRule.rule.dstPrefixLength = 24;
+
+    /*add the first input rule*/
+    rulemanager.addACLRule(aclRule,2);
+    //vector <int>().swap(aclRule.ruleIndexList);
+    vector <PortRange>().swap(portRanges2);
+    /*modify port range*/
+    portRange.lowValue = 50;
+    portRange.highValue = 60;
+    portRanges2.push_back(portRange);
+    aclRule.rule.dstPortRanges = portRanges2;
+    /*add the second input rule*/
+    rulemanager.addACLRule(aclRule,3);
+
+    aclRuleOutput.chainType = OutputDscp;
+    aclRuleOutput.dscp = 10;
+    aclRuleOutput.rule.flowType = FlowType::WcdmaCplane;
+    rulemanager.addACLRule(aclRuleOutput,2);
+    aclRuleOutput.dscp = 11;
+    rulemanager.addACLRule(aclRuleOutput,4);
+    aclRuleOutput.dscp = 12;
+    rulemanager.addACLRule(aclRuleOutput,3);
+    aclRuleOutput.dscp = 11;
+    rulemanager.delACLRule(aclRuleOutput);
+    aclRuleOutput.dscp = 13;
+    rulemanager.addACLRule(aclRuleOutput,3);
+
+
+    result = rulemanager.getRuleListByFlowtype(FlowType::WcdmaUplane,foundRuleList);
+    assert(true == result);
+    assert(2 == foundRuleList.size());
+    assert(Input == foundRuleList[0].chainType);
+    assert(Input == foundRuleList[1].chainType);
+    assert(2 == foundRuleList[0].ruleIndexList.size());
+    assert(ACL_INPUT_CHAIN_INDEX_MIN == foundRuleList[0].ruleIndexList[0]);
+    assert((ACL_INPUT_CHAIN_INDEX_MIN+1) == foundRuleList[0].ruleIndexList[1]);
+    assert(3 == foundRuleList[1].ruleIndexList.size());
+    assert((ACL_INPUT_CHAIN_INDEX_MIN+2) == foundRuleList[1].ruleIndexList[0]);
+    assert((ACL_INPUT_CHAIN_INDEX_MIN+3) == foundRuleList[1].ruleIndexList[1]);
+    assert((ACL_INPUT_CHAIN_INDEX_MIN+4) == foundRuleList[1].ruleIndexList[2]);
+    assert(IpAddress::from_string("192.168.255.1") == foundRuleList[0].rule.srcIp.get());
+    assert(IpAddress::from_string("192.168.255.3") == foundRuleList[0].rule.dstIp.get());
+    assert(IpAddress::from_string("192.168.255.1") == foundRuleList[1].rule.srcIp.get());
+    assert(IpAddress::from_string("192.168.255.3") == foundRuleList[1].rule.dstIp.get());
+    assert(24 == foundRuleList[0].rule.srcPrefixLength.get());
+    assert(24 == foundRuleList[0].rule.dstPrefixLength.get());
+    assert(24 == foundRuleList[1].rule.srcPrefixLength.get());
+    assert(24 == foundRuleList[1].rule.dstPrefixLength.get());
+    assert(10 == (foundRuleList[0].rule.srcPortRanges.get())[0].lowValue);
+    assert(20 == (foundRuleList[0].rule.srcPortRanges.get())[0].highValue);
+    assert(30 == (foundRuleList[0].rule.dstPortRanges.get())[0].lowValue);
+    assert(40 == (foundRuleList[0].rule.dstPortRanges.get())[0].highValue);
+    assert(10 == (foundRuleList[1].rule.srcPortRanges.get())[0].lowValue);
+    assert(20 == (foundRuleList[1].rule.srcPortRanges.get())[0].highValue);
+    assert(50 == (foundRuleList[1].rule.dstPortRanges.get())[0].lowValue);
+    assert(60 == (foundRuleList[1].rule.dstPortRanges.get())[0].highValue);
+    assert(3 == foundRuleList[0].rule.transportNetworkType.get());
+    assert(3 == foundRuleList[1].rule.transportNetworkType.get());
+    assert(5 == foundRuleList[0].rule.precedence.get());
+    assert(5 == foundRuleList[1].rule.precedence.get());
+
+    result = rulemanager.getRuleListByFlowtype(FlowType::WcdmaCplane,foundRuleList);
+    assert(true == result);
+    assert(3 == foundRuleList.size());
+    assert(OutputDscp == foundRuleList[0].chainType);
+    assert(OutputDscp == foundRuleList[1].chainType);
+    assert(OutputDscp == foundRuleList[2].chainType);
+    assert(2 == foundRuleList[0].ruleIndexList.size());
+    assert(ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN == foundRuleList[0].ruleIndexList[0]);
+    assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+1) == foundRuleList[0].ruleIndexList[1]);
+    assert(3 == foundRuleList[1].ruleIndexList.size());
+    assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+6) == foundRuleList[1].ruleIndexList[0]);
+    assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+7) == foundRuleList[1].ruleIndexList[1]);
+    assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+8) == foundRuleList[1].ruleIndexList[2]);
+    assert(3 == foundRuleList[2].ruleIndexList.size());
+    assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+2) == foundRuleList[2].ruleIndexList[0]);
+    assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+3) == foundRuleList[2].ruleIndexList[1]);
+    assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+4) == foundRuleList[2].ruleIndexList[2]);
+    assert(10 == foundRuleList[0].dscp);
+    assert(12 == foundRuleList[1].dscp);
+    assert(13 == foundRuleList[2].dscp);
+
+    
+    
+    cout<<"PASS testcase_rule_13"<<endl;
+}
+
+
 
 
 void testcase_compare_1()
@@ -672,9 +823,11 @@ void testcase_compare_2()
     
     aclRule1.chainType = OutputDscp;
     aclRule1.dscp = 10;
+    aclRule1.rule.flowType = FlowType::WcdmaUplane;
 
     aclRule2.chainType = OutputDscp;
     aclRule2.dscp = 10;
+    aclRule2.rule.flowType = FlowType::WcdmaUplane;
 
     result = ruleManager.compareACLRule(aclRule1,aclRule2);
     assert(true == result);
@@ -693,9 +846,11 @@ void testcase_compare_3()
     
     aclRule1.chainType = Input;
     aclRule1.rule.transportNetworkType= 10;
+    aclRule1.rule.flowType = FlowType::WcdmaUplane;
 
     aclRule2.chainType = Input;
     aclRule2.rule.transportNetworkType= 11;
+    aclRule2.rule.flowType = FlowType::WcdmaUplane;
 
     result = ruleManager.compareACLRule(aclRule1,aclRule2);
     assert(false == result);
@@ -713,8 +868,10 @@ void testcase_compare_4()
     cout<<"Input chain with rule is not initialized"<<endl;
     
     aclRule1.chainType = Input;
+    aclRule1.rule.flowType = FlowType::WcdmaUplane;
 
     aclRule2.chainType = Input;
+    aclRule2.rule.flowType = FlowType::WcdmaUplane;
 
     result = ruleManager.compareACLRule(aclRule1,aclRule2);
     assert(true == result);
@@ -733,9 +890,11 @@ void testcase_compare_5()
     cout<<"Input chain with different IP addresses"<<endl;
     
     aclRule1.chainType = Input;
+    aclRule1.rule.flowType = FlowType::WcdmaUplane;
     aclRule1.rule.srcIp = IpAddress::from_string("192.168.255.1");
 
     aclRule2.chainType = Input;
+    aclRule2.rule.flowType = FlowType::WcdmaUplane;
     aclRule2.rule.srcIp = IpAddress::from_string("192.168.255.3");
 
     result = ruleManager.compareACLRule(aclRule1,aclRule2);
@@ -755,9 +914,11 @@ void testcase_compare_6()
     cout<<"Input chain with one of IP address not initialized"<<endl;
     
     aclRule1.chainType = Input;
+    aclRule1.rule.flowType = FlowType::WcdmaUplane;
     aclRule1.rule.srcIp = IpAddress::from_string("192.168.255.1");
 
     aclRule2.chainType = Input;
+    aclRule2.rule.flowType = FlowType::WcdmaUplane;
 
     result = ruleManager.compareACLRule(aclRule1,aclRule2);
     assert(false == result);
@@ -775,9 +936,11 @@ void testcase_compare_7()
     cout<<"Input chain with identical IP addresses"<<endl;
     
     aclRule1.chainType = Input;
+    aclRule1.rule.flowType = FlowType::WcdmaUplane;
     aclRule1.rule.srcIp = IpAddress::from_string("192.168.255.1");
 
     aclRule2.chainType = Input;
+    aclRule2.rule.flowType = FlowType::WcdmaUplane;
     aclRule2.rule.srcIp = IpAddress::from_string("192.168.255.1");
 
     result = ruleManager.compareACLRule(aclRule1,aclRule2);
@@ -798,6 +961,7 @@ void testcase_compare_8()
     cout<<"Input chain with identical IP addresses and port ranges"<<endl;
     
     aclRule1.chainType = Input;
+    aclRule1.rule.flowType = FlowType::WcdmaUplane;
     aclRule1.rule.srcIp = IpAddress::from_string("192.168.255.1");
     portRange.lowValue = 10;
     portRange.highValue = 20;
@@ -805,6 +969,7 @@ void testcase_compare_8()
     aclRule1.rule.srcPortRanges = portRanges1;
 
     aclRule2.chainType = Input;
+    aclRule2.rule.flowType = FlowType::WcdmaUplane;
     aclRule2.rule.srcIp = IpAddress::from_string("192.168.255.1");
     portRange.lowValue = 10;
     portRange.highValue = 20;
@@ -829,6 +994,7 @@ void testcase_compare_9()
     cout<<"Input chain with identical IP addresses and different port ranges"<<endl;
     
     aclRule1.chainType = Input;
+    aclRule1.rule.flowType = FlowType::WcdmaUplane;
     aclRule1.rule.srcIp = IpAddress::from_string("192.168.255.1");
     portRange.lowValue = 10;
     portRange.highValue = 20;
@@ -836,6 +1002,7 @@ void testcase_compare_9()
     aclRule1.rule.srcPortRanges = portRanges1;
 
     aclRule2.chainType = Input;
+    aclRule2.rule.flowType = FlowType::WcdmaUplane;
     aclRule2.rule.srcIp = IpAddress::from_string("192.168.255.1");
     portRange.lowValue = 10;
     portRange.highValue = 30;
@@ -862,6 +1029,7 @@ void testcase_compare_10()
     cout<<"Input chain with one port ranges not initialized"<<endl;
     
     aclRule1.chainType = Input;
+    aclRule1.rule.flowType = FlowType::WcdmaUplane;
     aclRule1.rule.srcIp = IpAddress::from_string("192.168.255.1");
     portRange.lowValue = 10;
     portRange.highValue = 20;
@@ -869,6 +1037,7 @@ void testcase_compare_10()
     aclRule1.rule.srcPortRanges = portRanges1;
 
     aclRule2.chainType = Input;
+    aclRule2.rule.flowType = FlowType::WcdmaUplane;
     aclRule2.rule.srcIp = IpAddress::from_string("192.168.255.1");
 
     result = ruleManager.compareACLRule(aclRule1,aclRule2);
@@ -892,6 +1061,7 @@ void testcase_compare_11()
     cout<<"Input chain with identical src IP addresses and dst port ranges"<<endl;
     
     aclRule1.chainType = Input;
+    aclRule1.rule.flowType = FlowType::WcdmaUplane;
     aclRule1.rule.srcIp = IpAddress::from_string("192.168.255.1");
     portRange.lowValue = 10;
     portRange.highValue = 20;
@@ -899,6 +1069,7 @@ void testcase_compare_11()
     aclRule1.rule.dstPortRanges = portRanges1;
 
     aclRule2.chainType = Input;
+    aclRule2.rule.flowType = FlowType::WcdmaUplane;
     aclRule2.rule.srcIp = IpAddress::from_string("192.168.255.1");
     portRange.lowValue = 10;
     portRange.highValue = 20;
@@ -914,6 +1085,7 @@ void testcase_compare_11()
 
 int main()
 {
+    cout<<"TEST CASES START"<<endl;
     testcase_index_1();
     testcase_index_2();
     testcase_index_3();
@@ -932,6 +1104,8 @@ int main()
     testcase_rule_9();
     testcase_rule_10();
     testcase_rule_11();
+    testcase_rule_12();
+    testcase_rule_13();
     testcase_compare_1();
     testcase_compare_2();
     testcase_compare_3();
@@ -943,6 +1117,7 @@ int main()
     testcase_compare_9();
     testcase_compare_10();
     testcase_compare_11();
+
     cout<<"ALL CASES PASSED"<<endl;
 #if 0
     cout<<"main"<<endl;
