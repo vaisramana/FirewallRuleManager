@@ -54,7 +54,7 @@ struct TestOuterClass
     void setInnerData(int input);
     int getInnerData();
     TestInnerClass * getInner_pointer();
-    TestInnerClass & getInner_quote();
+    TestInnerClass & getInner_reference();
     private:
     int outerData;
     TestInnerClass inner;
@@ -77,7 +77,7 @@ TestInnerClass * TestOuterClass::getInner_pointer()
     return &inner;
 }
 
-TestInnerClass & TestOuterClass::getInner_quote()
+TestInnerClass & TestOuterClass::getInner_reference()
 {
     return inner;
 }
@@ -1081,6 +1081,37 @@ void testcase_compare_11()
 
 int main()
 {
+#if 0
+
+    cout<<"testing pointer and reference"<<endl;
+    TestOuterClass outer;
+    TestInnerClass innerReference;
+    TestInnerClass * innerPtr;
+    outer.setInnerData(100);
+    //cout<<"(outer.getInner_pointer())->getInnerData="<<(outer.getInner_pointer())->getInnerData()<<endl;
+    outer.setInnerData(200);
+    //cout<<"(outer.getInner_reference()).getInnerData="<<(outer.getInner_reference()).getInnerData()<<endl;
+
+    innerReference = outer.getInner_reference();
+    innerPtr = outer.getInner_pointer();
+
+    innerReference.setInnerData(300);
+    cout<<"using reference: outer.inner.innerData=:"<<(outer.getInner_pointer())->getInnerData()
+        <<" innerReference.getInnerData():"<<innerReference.getInnerData()<<endl;
+    innerPtr->setInnerData(400);
+    cout<<"using pointer: outer.inner.innerData=:"<<(outer.getInner_pointer())->getInnerData()
+        <<" innerPtr->getInnerData():"<<innerPtr->getInnerData()<<endl;
+
+    /*
+        test result:
+            testing pointer and reference
+            using reference: outer.inner.innerData=:200 innerReference.getInnerData():300        <-- value assignment failure
+            using pointer: outer.inner.innerData=:400 innerPtr->getInnerData():400                  <-- value assignment successful
+            
+        */
+#endif
+    
+
     cout<<"TEST CASES START"<<endl;
     testcase_index_1();
     testcase_index_2();
@@ -1115,21 +1146,10 @@ int main()
     testcase_compare_11();
 
     cout<<"ALL CASES PASSED"<<endl;
+    
 #if 0
     cout<<"main"<<endl;
-    cout<<"testing pointer and quote"<<endl;
-    TestOuterClass outer;
-    outer.setInnerData(100);
-    cout<<"(outer.getInner_pointer())->getInnerData="<<(outer.getInner_pointer())->getInnerData()<<endl;
-    outer.setInnerData(200);
-    cout<<"(outer.getInner_quote()).getInnerData="<<(outer.getInner_quote()).getInnerData()<<endl;
 
-    (outer.getInner_pointer())->setInnerData(333);
-    cout<<"outer.getInnerData="<<outer.getInnerData()<<endl;
-    (outer.getInner_quote()).setInnerData(444);
-    cout<<"outer.getInnerData="<<outer.getInnerData()<<endl;
-
-    cout<<"end of test \n\n\n"<<endl;
     cout<<"testing & *"<<endl;
     int a = 0;
     func1(a);
