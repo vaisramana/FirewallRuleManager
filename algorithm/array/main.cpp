@@ -18,13 +18,14 @@ public:
     /*sort*/
     void bubbleSort(vector<int> & input);
     void selectiveSort(vector<int> & input);
+    void insertingSort(vector<int> & input);
     
 };
 
 void arrayOperation::printArray(vector<int> input)
 {
     int i;
-    cout<<"Array size:"<<input.size()<<" elements:"<<endl;
+    //cout<<"Array size:"<<input.size()<<" elements:"<<endl;
     for(i=0; i<input.size(); i++)
     {
         cout<<input[i]<<" ";
@@ -77,6 +78,10 @@ bool arrayOperation::binarySearch(vector<int> input, int key, int & index)
 }
 
 /*
+time complexity o(n^2)
+memory complexity o(1)
+comparasion time n(n+1)/2
+
 example:
 13 6 18 1 1 16
 each rround to compare with neighbors and move the bigger one to right
@@ -151,6 +156,58 @@ void arrayOperation::selectiveSort(vector<int> & input)
     }
 }
 
+/*
+time complexity o(n^2)
+memory complexity o(1)
+comparasion time n(n+1)/2
+
+example:
+13 6 18 1 1 16
+round 1: only 13 in sorted array
+13 (6 18 1 1 16)
+round 2: 13 and 6 in sorted array
+6 13 (18 1 1 16)
+round 3: 13 6 18 in sorted array
+6 13 18 (1 1 16)
+round 4: 13 6 18 1 in sorted array
+1 6 13 18 (1 16)
+round 5: 13 6 18 1 1 in sorted array
+1 1 6 13 18 ( 16)
+round 5: all elements in sorted array
+1 1 6 13 16 18
+*/
+void arrayOperation::insertingSort(vector<int> & input)
+{
+    int tmp,i,j;
+
+    for(i = 1;i < input.size();i++)
+    {
+        if (input[i] < input[i-1])
+        {
+            tmp = input[i];
+            input[i] = input[i-1];
+
+            for (j = i-2;j >= 0;j--)
+            {
+                if (input[j] > tmp )
+                {
+                    input[j+1] = input[j];
+                }
+                else
+                {
+                    input[j+1] = tmp;
+                    break;
+                }
+            }
+            if(j == -1)
+            {
+                input[j+1] = tmp;
+            }
+        }
+        printArray(input);
+    }
+}  
+
 
 
 int main()
@@ -172,8 +229,8 @@ int main()
     cout<<"binarySearch() result:"<<result<<" indexFound:"<<indexFound<<endl;
 */
 
-    array.printArray(input);
-    array.bubbleSort(input);
-    array.printArray(input);
+    //array.printArray(input);
+    array.insertingSort(input);
+    //array.printArray(input);
 }
 
