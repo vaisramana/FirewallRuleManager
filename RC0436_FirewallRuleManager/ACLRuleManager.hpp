@@ -27,6 +27,11 @@ public:
     bool getIndexList(In<ACLChainType> chainType, IndexList **indexListPtrPtr);
     bool findIndexPositionFromPool(In<ACLChainType> chainType, In<IndexList> indexListToFind, Out<IndexList> indexPosListFound);
     bool getRuleListByFlowtype(In<FlowType> flowType, Out<std::vector<ACLRule> > foundRuleList);
+
+    bool addDefaultRules();
+    bool getIpAndIfMap(Out<map<string, string> >ipMap, Out<map<string, string> >ifMap);
+    bool convertIpAddress(In<string> inputAddress, Out<string> outputAddress);
+    
          
     vector<ACLRule> ruleList;
     vector<IndexList > indexPool; /* 2 index list corresponding to input, output dscp and output others */

@@ -1,6 +1,12 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/regex.hpp>
+#include <boost/lexical_cast.hpp>
+#include <string>
 #include "ACLRuleManager.hpp"
 #include "CommonFunc.hpp"
 
@@ -455,6 +461,348 @@ using namespace std;
         }
         
         return true;
+    }
+
+    bool ACLRuleManager::convertIpAddress(In<string> inputAddress, Out<string> outputAddress)
+     {
+         vector<string> numbers;
+         vector<string> numbersModified;
+         int i,mask;
+         unsigned int ip=0;
+ 
+         cout<<"convertIpAddress() input: "<<inputAddress<<endl;
+         boost::split(numbers, inputAddress, boost::is_any_of("./"), boost::token_compress_on);
+         if(5 != numbers.size())
+         {
+             cout<<"WRN/ convertIpAddress() with wrong input"<<endl;
+             return false;
+         }
+ 
+         mask = boost::lexical_cast<int>(numbers[4]);
+         for(i=0; i<(numbers.size()-1); i++)
+         {
+             ip = ip|((boost::lexical_cast<int>(numbers[i]))<<(24-8*i));
+             //cout<<"ip = "<<ip<<" numbers[i] = "<<(boost::lexical_cast<int>(numbers[i]))<<endl;
+         }
+         ip = (ip>>(32-mask))<<(32-mask);
+         //cout<<"int ip = "<<ip<<endl;
+ 
+         for(i=0; i<4; i++)
+         {
+             numbersModified.push_back(boost::lexical_cast<string>((ip<<i*8)>>24));
+         }
+         outputAddress = boost::join(numbersModified, ".");
+         outputAddress = outputAddress + "/" + (boost::lexical_cast<string>(numbers[4]));
+         cout<<"convertIpAddress() outputAddress = "<<outputAddress<<endl;
+         return true;
+     }
+
+     bool ACLRuleManager::getIpAndIfMap(Out<std::map<string, string> >ipMap, Out<std::map<string, string> >ifMap)
+     {
+         //string ipInfo = "ip-info=management,fa:16:3e:9f:56:bc,192.168.1.3/24,|internal,fa:16:3e:73:f3:2d,169.254.0.20/19,|intmsg0,fa:16:3e:d1:d0:fb,169.254.64.2/24,|oam,fa:16:3e:79:bf:15,10.56.66.77/24,";
+         string ipInfo = "ip-info=management,fa:16:3e:8d:a8:f5,192.168.1.7/24,|internal,fa:16:3e:a5:79:e8,169.254.0.23/19,|intmsg0,fa:16:3e:c6:13:c9,169.254.64.5/24,|ext0,fa:16:3e:1a:08:45,100.1.7.9/24,|ext1,fa:16:3e:15:43:47,100.1.8.6/24,|ext2,fa:16:3e:a2:85:07,100.1.9.6/24,";
+         //string ifInfo = "interface-info=management,internal,1500,9000|internal,internal,1500,9000|intmsg0,internal,1500,9000|oam,oam,1500,9000";
+         string ifInfo = "interface-info=management,internal,1500,9000|internal,internal,1500,9000|intmsg0,internal,1500,9000|ext0,external,1500,9000|ext1,external,1500,9000|ext2,external,1500,9000";
+         vector<string> lines;
+         vector<string>::iterator iterString;
+         string replacedString;
+         //string ipInfo,ifInfo; 
+         std::map<string, string>::iterator iterMap;
+         //ErrorCode ret;
+         string ns = "MEI-0";
+         int i;
+         std::string cmd;
+         std::vector<string> cmdList; 
+
+
+         /*fetch IP and IF info*/
+         /*
+        cmd = "ssh " + ns + " \"getinitarg ip-info\"";
+        ret = tpl::exec_fscli_directly(cmd, "Firewall", pErrCategory.get());
+        if (ret.value() != static_cast<int>(tpi::ErrorValue::Success))
+        {
+              return ret;
+        }
+        ipInfo = pErrCategory.get()->message(0);
+
+        cmd = "ssh " + ns + " \"getinitarg interface-info\"";
+        ret = tpl::exec_fscli_directly(cmd, "Firewall", pErrCategory.get());
+        if (ret.value() != static_cast<int>(tpi::ErrorValue::Success))
+        {
+              return ret;
+        }
+        ifInfo = pErrCategory.get()->message(0);
+         */
+ 
+         
+         /*parse IP info*/
+         boost::split(lines, ipInfo, boost::is_any_of(",=|"), boost::token_compress_on);
+         for(i=0,iterString=lines.begin(); iterString!=lines.end(); iterString++,i++)
+         {
+             if(boost::contains(*iterString, "/"))
+             {
+                 if(false == convertIpAddress(*iterString,replacedString))
+                 {
+                     return false;
+                 }
+                 *iterString = replacedString;
+             }
+             cout<<lines[i]<<endl;
+             if(i)
+             {
+                 if((i-1)%3==2)
+                 {
+                     ipMap[*(iterString-2)]=(*iterString);
+                     // cout<<"map "<<*(iterString-2)<<" to "<<(*iterString)<<endl;
+                 }
+             }
+         }
+         /*print ipMap*/
+         cout<<"ipMap with size "<<ipMap.size()<<":"<<endl;
+         for(iterMap=ipMap.begin(); iterMap!=ipMap.end(); iterMap++)
+         {
+             cout<<iterMap->first <<"->"<<iterMap->second<<" ";
+         }
+         cout<<endl;
+ 
+         /*parse IF info*/
+         boost::split(lines, ifInfo, boost::is_any_of(",=|"), boost::token_compress_on);
+         for(i=0,iterString=lines.begin(); iterString!=lines.end(); iterString++,i++)
+         {
+             
+             if(i)
+             {
+                 if((i-1)%4==1)
+                 {
+                     ifMap[*(iterString-1)]=(*iterString);
+                 }
+             }
+         }
+ 
+         /*print ifMap*/
+         cout<<"ifMap with size "<<ifMap.size()<<":"<<endl;
+         for(iterMap=ifMap.begin(); iterMap!=ifMap.end(); iterMap++)
+         {
+             cout<<iterMap->first <<"->"<<iterMap->second<<" ";
+         }
+         cout<<endl;
+         return true;
+     }
+
+     bool ACLRuleManager::addDefaultRules()
+    {
+        std::string cmd;
+        std::vector<string> cmdList; 
+        bool ret;
+        std::vector<std::string> chainTypeList;
+        std::vector<std::string> icmpTypeList;
+        std::vector<std::string> addrTypeList;
+        std::vector<std::string> ifTypeList;
+        int i,j;
+        int index = ACL_DEFAULT_BOTTOM_INDEX_MIN;
+        int spoofIndex = ACL_DEFAULT_TOP_INDEX_MIN;
+        string ns = "MEI-0";
+        //std::string ipInfo,ifInfo;
+        std::map<string, string> ipMap;
+        std::map<string, string> ifMap;
+        std::map<string, string>::iterator iterIpMap;
+        std::map<string, string>::iterator iterIfMap,iterIfMapTmp;
+
+        chainTypeList.push_back("input");
+        chainTypeList.push_back("output");
+        icmpTypeList.push_back("0");
+        icmpTypeList.push_back("3");
+        icmpTypeList.push_back("8");
+        icmpTypeList.push_back("11");
+        icmpTypeList.push_back("12");
+        addrTypeList.push_back("srcaddr");
+        addrTypeList.push_back("dstaddr");
+        ifTypeList.push_back("input-iface");
+        ifTypeList.push_back("output-iface");
+        
+        /*Disable iptables in fastpath, to improve the fastpath throughput*/
+        cmd.clear();
+        cmd += "ssh ";
+        cmd += ns;
+        cmd += " \"fpdebug nf-switch all_tables all_hooks off\"";
+        /*
+        ret = tpl::exec_fscli_directly(cmd, "Firewall", pErrCategory.get());
+        if (ret.value() != static_cast<int>(tpi::ErrorValue::Success))
+        {
+            return ret;
+        }*/
+        cmdList.push_back(cmd);
+        
+
+        cout<<"addDefaultRules() done"<<endl;
+
+        /*Ingress packet filtering and rate limiting rules for ICMP*/
+        cmd.clear();
+
+        for(i=0; i<chainTypeList.size(); i++)
+        {
+            for(j=0; j<icmpTypeList.size(); j++)
+            {
+                cmd = "add networking aclrule /" 
+                      + ns
+                      + " index " + std::to_string(index)
+                      + " vrf default chain " + chainTypeList[i]
+                      + " protocol icmp icmptype " + icmpTypeList[j]
+                      + " limit 25 limit-burst 8 accept";
+                cmdList.push_back(cmd);
+                index++;
+                cmd = "add networking aclrule /" 
+                      + ns
+                      + " index " + std::to_string(index)
+                      + " vrf default chain " + chainTypeList[i]
+                      + " protocol icmp icmptype " + icmpTypeList[j]
+                      + " drop";
+                cmdList.push_back(cmd);
+                index++;
+            }
+        }
+
+        /*Ingress rate limiting rules for TWAMP reflector and UDP echo server*/
+        cmd = "add networking aclrule /" 
+              + ns
+              + " index " + std::to_string(index)
+              + " vrf default chain input"
+              + " protocol udp"
+              + " limit 100 limit-burst 100 accept";
+        cmdList.push_back(cmd);
+        index++;
+        cmd = "add networking aclrule /" 
+              + ns
+              + " index " + std::to_string(index)
+              + " vrf default chain input"
+              + " protocol udp"
+              + " drop";
+        cmdList.push_back(cmd);
+        index++;
+
+        /*Ingress rate limiting rules for ARP request and reply*/
+        cmd = "add networking firewall arp limit 300 limit-burst 2";
+        cmdList.push_back(cmd);
+
+        /*Spoof rule*/
+        ret = getIpAndIfMap(ipMap,ifMap);
+        if (ret != true)
+        {
+              return ret;
+        }
+
+        /*Spoof prevention - internal IP address/external interface/INPUT&OUTPUT chain*/
+         for(iterIfMap=ifMap.begin(); iterIfMap!=ifMap.end(); iterIfMap++)
+         {
+             if("internal" != iterIfMap->second)
+             {
+                 /*found external IF*/
+                 for(iterIpMap=ipMap.begin(); iterIpMap!=ipMap.end(); iterIpMap++)
+                 {
+                    iterIfMapTmp = ifMap.find(iterIpMap->first);
+                    if((ifMap.end() != iterIfMapTmp)&&
+                        ("internal" == iterIfMapTmp->second))
+                    {
+                        /*found internal IP*/
+                        for(i=0; i<chainTypeList.size(); i++)
+                        {
+                            for(j=0; j<addrTypeList.size(); j++)
+                            {
+                                cmd = "add networking aclrule /" 
+                                      + ns
+                                      + " index " + std::to_string(spoofIndex)
+                                      + " vrf default chain " + chainTypeList[i]
+                                      + " " + ifTypeList[i] + " " + iterIfMap->first
+                                      + " "+ addrTypeList[j] + " " + iterIpMap->second
+                                      + " drop";
+                                spoofIndex++;
+                                cmdList.push_back(cmd);
+                            }
+                        }
+                        /*
+                        cmd = "add networking aclrule /" 
+                              + ns
+                              + " index " + std::to_string(spoofIndex)
+                              + " vrf default chain input"
+                              + " input-iface " + iterIfMap->first
+                              + " srcaddr " + iterIpMap->second
+                              + " drop";
+                        
+                        
+                        cmd = "add networking aclrule /" 
+                              + ns
+                              + " index " + std::to_string(spoofIndex)
+                              + " vrf default chain input"
+                              + " input-iface " + iterIfMap->first
+                              + " dstaddr " + iterIpMap->second
+                              + " drop";
+                        spoofIndex++;
+                        cmdList.push_back(cmd);*/
+                    }
+                 }
+                 /*add 4 more rules with IP 127.0.0.1 which is not specified in ip info*/
+
+                 for(i=0; i<chainTypeList.size(); i++)
+                 {
+                     for(j=0; j<addrTypeList.size(); j++)
+                     {
+                         cmd = "add networking aclrule /" 
+                               + ns
+                               + " index " + std::to_string(spoofIndex)
+                               + " vrf default chain " + chainTypeList[i]
+                               + " " + ifTypeList[i] + " " + iterIfMap->first
+                               + " "+ addrTypeList[j] + " 127.0.0.1"
+                               + " drop";
+                         spoofIndex++;
+                         cmdList.push_back(cmd);
+                     }
+                 }
+                 /*
+                 cmd = "add networking aclrule /" 
+                      + ns
+                      + " index " + std::to_string(spoofIndex)
+                      + " vrf default chain input"
+                      + " input-iface " + iterIfMap->first
+                      + " srcaddr 127.0.0.1"
+                      + " drop";
+                spoofIndex++;
+                cmdList.push_back(cmd); 
+                cmd = "add networking aclrule /" 
+                      + ns
+                      + " index " + std::to_string(spoofIndex)
+                      + " vrf default chain input"
+                      + " input-iface " + iterIfMap->first
+                      + " dstaddr 127.0.0.1"
+                      + " drop";
+                spoofIndex++;
+                cmdList.push_back(cmd);*/
+                 
+             }
+         }
+
+         /*drop all rules*/
+         cmd = "add networking aclrule /" 
+               + ns
+               + " index " + std::to_string(ACL_DEFAULT_BOTTOM_INDEX_MAX)
+               + " vrf default drop";
+         cmdList.push_back(cmd);
+         
+         
+        /*print all rules*/
+        cout<<"all default rules:"<<endl;
+        for(i=0; i<cmdList.size();i++)
+        {
+            cout<<cmdList[i]<<endl;
+        }
+        
+        /*ret = tpl::exec_transaction_commands(cmdList, "Firewall", pErrCategory.get());
+        if(ret.value() != static_cast<int>(tpi::ErrorValue::Success))
+        {
+            return ret;
+        }*/
+        return true;
+        
+        
     }
 
 

@@ -1129,6 +1129,18 @@ void testcase_compare_11()
 }
 
 
+void testcase_default_rule_generator()
+{
+    ACLRuleManager ruleManager;
+
+    cout<<"START testcase_default_rule_generator: ";
+    cout<<"generate default rules"<<endl;
+    ruleManager.addDefaultRules();
+    
+    cout<<"PASS testcase_default_rule_generator"<<endl;
+}
+
+
 
 int main()
 {
@@ -1196,6 +1208,7 @@ int main()
     testcase_compare_9();
     testcase_compare_10();
     testcase_compare_11();
+    testcase_default_rule_generator();
 
     cout<<"ALL CASES PASSED"<<endl;
     
