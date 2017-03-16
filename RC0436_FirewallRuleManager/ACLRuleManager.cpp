@@ -663,22 +663,8 @@ using namespace std;
         }
 
         /*Ingress rate limiting rules for TWAMP reflector and UDP echo server*/
-        cmd = "add networking aclrule /" 
-              + ns
-              + " index " + std::to_string(index)
-              + " vrf default chain input"
-              + " protocol udp"
-              + " limit 100 limit-burst 100 accept";
+        cmd = "add networking firewall twamp limit 100 limit-burst 100";
         cmdList.push_back(cmd);
-        index++;
-        cmd = "add networking aclrule /" 
-              + ns
-              + " index " + std::to_string(index)
-              + " vrf default chain input"
-              + " protocol udp"
-              + " drop";
-        cmdList.push_back(cmd);
-        index++;
 
         /*Ingress rate limiting rules for ARP request and reply*/
         cmd = "add networking firewall arp limit 300 limit-burst 2";
