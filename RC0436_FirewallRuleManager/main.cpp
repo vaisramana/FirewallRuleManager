@@ -784,6 +784,57 @@ void testcase_rule_13()
 
 
 
+void testcase_rule_14()
+{
+    ACLRuleManager rulemanager;
+    ACLRule aclRule,aclRuleOutput;
+    bool result;
+    PortRange portRange;
+    PortRanges portRanges1,portRanges2;
+    vector < ACLRule > foundRuleList;
+    cout<<"START testcase_rule_14: ";
+    cout<<"insert same rule multi times then delete"<<endl;
+
+    aclRule.chainType = OutputDscp;
+    aclRule.dscp = 10;
+    rulemanager.addACLRule(aclRule,1);
+    rulemanager.addACLRule(aclRule,1);
+    rulemanager.addACLRule(aclRule,1);
+    rulemanager.addACLRule(aclRule,1);
+    rulemanager.addACLRule(aclRule,1);
+
+    result = rulemanager.delACLRule(aclRule);
+    assert(true ==result);
+    assert(1 == aclRule.ruleIndexList.size());
+    assert(ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN == aclRule.ruleIndexList[0]);
+
+    result = rulemanager.delACLRule(aclRule);
+    assert(true ==result);
+    assert(1 == aclRule.ruleIndexList.size());
+    assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+1) == aclRule.ruleIndexList[0]);
+
+    result = rulemanager.delACLRule(aclRule);
+    assert(true ==result);
+    assert(1 == aclRule.ruleIndexList.size());
+    assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+2) == aclRule.ruleIndexList[0]);
+
+    result = rulemanager.delACLRule(aclRule);
+    assert(true ==result);
+    assert(1 == aclRule.ruleIndexList.size());
+    assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+3) == aclRule.ruleIndexList[0]);
+
+    result = rulemanager.delACLRule(aclRule);
+    assert(true ==result);
+    assert(1 == aclRule.ruleIndexList.size());
+    assert((ACL_OUTPUT_CHAIN_DSCP_INDEX_MIN+4) == aclRule.ruleIndexList[0]);
+
+    assert(true == rulemanager.ruleList.empty());
+    assert(true == rulemanager.indexPool[0].empty());
+    assert(true == rulemanager.indexPool[1].empty());
+    cout<<"PASS testcase_rule_14"<<endl;
+}
+
+
 
 void testcase_compare_1()
 {
@@ -1133,6 +1184,7 @@ int main()
     testcase_rule_11();
     testcase_rule_12();
     testcase_rule_13();
+    testcase_rule_14();
     testcase_compare_1();
     testcase_compare_2();
     testcase_compare_3();
