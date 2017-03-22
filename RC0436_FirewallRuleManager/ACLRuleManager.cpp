@@ -248,10 +248,10 @@ using namespace std;
             /*found available position in the end of list*/
             for(i=1; i<(indexNumberToAdd+1); i++)
             {
-             lastIndex = (*indexListPtr).back();
-             //cout<<"end:"<<((*currentIndexListPtr).back())<<endl;
-             (*indexListPtr).push_back(lastIndex+1);
-             indexListToAdd.push_back(lastIndex+1);
+                lastIndex = (*indexListPtr).back();
+                //cout<<"end:"<<((*currentIndexListPtr).back())<<endl;
+                (*indexListPtr).push_back(lastIndex+1);
+                indexListToAdd.push_back(lastIndex+1);
             }
             
             return true;
@@ -303,28 +303,25 @@ using namespace std;
         {
             return false;
         }
-
+        //here specific Qos rule compare(Qos: dscp + rule)
+        if( (OutputDscp == aclRule1.chainType)&&(aclRule1.dscp != aclRule2.dscp) )
+        {
+            return false ;
+        }
+        
         rule1 = aclRule1.rule;
         rule2 = aclRule2.rule;
         
-        if(OutputDscp == aclRule1.chainType)
+        //common process to compare the collumns of rule
+        //(Filter rule just include rule , follow common process )
+        if((rule1.flowType == rule2.flowType)&&
+           (rule1.transportNetworkType == rule2.transportNetworkType)&&
+           (rule1.precedence == rule2.precedence)&&
+           (rule1.srcIp == rule2.srcIp)&&
+           (rule1.srcPrefixLength == rule2.srcPrefixLength)&&
+           (rule1.dstIp == rule2.dstIp)&&
+           (rule1.dstPrefixLength == rule2.dstPrefixLength))
         {
-            if((rule1.flowType == rule2.flowType)&&
-                (aclRule1.dscp == aclRule2.dscp))
-            {
-                return true;
-            }
-        }
-        else
-        {
-            if((rule1.flowType == rule2.flowType)&&
-                (rule1.transportNetworkType == rule2.transportNetworkType)&&
-                (rule1.precedence == rule2.precedence)&&
-                (rule1.srcIp == rule2.srcIp)&&
-                (rule1.srcPrefixLength == rule2.srcPrefixLength)&&
-                (rule1.dstIp == rule2.dstIp)&&
-                (rule1.dstPrefixLength == rule2.dstPrefixLength))
-            {
                 /*check srcPortRanges*/
                 if ((rule1.srcPortRanges.is_initialized())^(rule2.srcPortRanges.is_initialized()))
                 {
@@ -373,7 +370,7 @@ using namespace std;
                     <<"rule2.srcPortRanges.is_initialized(): "<<rule2.srcPortRanges.is_initialized()<<" "
                     <<endl;*/
                 return true;
-            }
+            
         }
         return false;
     }
