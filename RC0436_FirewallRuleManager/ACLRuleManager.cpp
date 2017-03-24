@@ -644,7 +644,7 @@ using namespace std;
                       + ns
                       + " index " + std::to_string(index)
                       + " vrf default chain " + chainTypeList[i]
-                      + " protocol icmp icmptype " + icmpTypeList[j]
+                      + " protocol icmp icmp-type " + icmpTypeList[j]
                       + " limit 25 limit-burst 8 accept";
                 cmdList.push_back(cmd);
                 index++;
@@ -652,7 +652,7 @@ using namespace std;
                       + ns
                       + " index " + std::to_string(index)
                       + " vrf default chain " + chainTypeList[i]
-                      + " protocol icmp icmptype " + icmpTypeList[j]
+                      + " protocol icmp icmp-type " + icmpTypeList[j]
                       + " drop";
                 cmdList.push_back(cmd);
                 index++;
@@ -694,7 +694,7 @@ using namespace std;
                                 cmd = "add networking aclrule /" 
                                       + ns
                                       + " index " + std::to_string(spoofIndex)
-                                      + " vrf default chain " + chainTypeList[i]
+                                      + " chain " + chainTypeList[i]
                                       + " " + ifTypeList[i] + " " + iterIfMap->first
                                       + " "+ addrTypeList[j] + " " + iterIpMap->second
                                       + " drop";
@@ -732,7 +732,7 @@ using namespace std;
                          cmd = "add networking aclrule /" 
                                + ns
                                + " index " + std::to_string(spoofIndex)
-                               + " vrf default chain " + chainTypeList[i]
+                               + " chain " + chainTypeList[i]
                                + " " + ifTypeList[i] + " " + iterIfMap->first
                                + " "+ addrTypeList[j] + " 127.0.0.1"
                                + " drop";
