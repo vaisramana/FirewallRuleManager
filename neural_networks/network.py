@@ -114,8 +114,14 @@ class Network(object):
         neuron in the final layer has the highest activation."""
         test_results = [(np.argmax(self.feedforward(x)), y)
                         for (x, y) in test_data]
+        #check output in case of detection failure happens
+        """
+        for (x, y) in test_data:
+            if np.argmax(self.feedforward(x)) != y :
+                print "detect failure: {0}".format(self.feedforward(x))
+                print "correct one: {0}".format(y)
         return sum(int(x == y) for (x, y) in test_results)
-
+		"""
     def cost_derivative(self, output_activations, y):
         """Return the vector of partial derivatives \partial C_x /
         \partial a for the output activations."""
