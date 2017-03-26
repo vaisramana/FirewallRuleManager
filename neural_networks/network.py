@@ -1,6 +1,7 @@
 
 import random
 import numpy as np
+import time
 
 class Network(object):
 
@@ -39,6 +40,7 @@ class Network(object):
         tracking progress, but slows things down substantially."""
         if test_data: n_test = len(test_data)
         n = len(training_data)
+        ticks = time.time()
         for j in xrange(epochs):
             random.shuffle(training_data)
             mini_batches = [
@@ -46,11 +48,13 @@ class Network(object):
                 for k in xrange(0, n, mini_batch_size)]
             for mini_batch in mini_batches:
                 self.update_mini_batch(mini_batch, eta)
+            deltaTicks = time.time() - ticks
+            ticks = time.time()
             if test_data:
-                print "Epoch {0}: {1} / {2}".format(
-                    j, self.evaluate(test_data), n_test)
+                print "Epoch {0}: {1} / {2} consuming {3}s".format(
+                    j, self.evaluate(test_data), n_test, deltaTicks)
             else:
-                print "Epoch {0} complete".format(j)
+                print "Epoch {0} complete consuming {1}s".format(j, deltaTicks)
 
     def update_mini_batch(self, mini_batch, eta):
         """Update the network's weights and biases by applying
@@ -126,19 +130,4 @@ def sigmoid_prime(z):
     """Derivative of the sigmoid function."""
     return sigmoid(z)*(1-sigmoid(z))
     
-"""
-net = Network([2,3,1])
-print net.num_layers
-print net.sizes
-print "biases="
-print net.biases
-print "weights="
-print net.weights
-print "zip(self.biases, self.weights)="
-for b, w in zip(net.biases, net.weights):
-    print "b="
-    print b
-    print "w="
-    print w
-"""
 
