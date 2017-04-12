@@ -1,10 +1,11 @@
 
 import numpy as np
+import time
 
 class SVM(object):
     def __init__(self):
-        weight = np.random.randn(32*32*3+1,10)
-        delat = 1
+        self.weight = np.random.randn(32*32*3+1,10)
+        self.delta = 1
 
 
     def SVM_loss(self, trainData, trainLabels, lmbd):
@@ -30,7 +31,7 @@ class SVM(object):
             #0...9
             for j in xrange(classNum):
                 if j!= trainLabels[i]:
-                    margin = scores[j] - correct_class_score + self.delat
+                    margin = scores[j] - correct_class_score + self.delta
                     if margin>0:
                         loss += margin
         #calculate dw
@@ -46,41 +47,40 @@ class SVM(object):
 
         return loss, dW
 
-    def evaluate(testData, testLabels):
+    def evaluate(self, testData, testLabels):
         correctNum = 0
         imageNum = testData.shape[0]
-        classNum = testLabels.shape[1]
 
         for i in xrange(imageNum):
             scores = testData[i].dot(self.weight)
             if np.argmax(scores) == testLabels[i]:
                 correctNum += 1
         return correctNum
-        
-"""
-	def update_mini_batch(self, mini_batch, eta, lambda, delta):
-        for x, y in mini_batch:
-            loss, dW = self.SVM_loss(x, y, self.weight, lambda, delta)
-            self.weight = self.weight - eta*dW
 
-    def SGD(self, trainData, trainLabels, epochs, mini_batch_size, eta, lambda, delta, testData=None, testLabels=None):
-        if test_data: n_test = len(test_data)
-        n = len(training_data)
+    def update_weight(self, dW, eta):
+        self.weight = self.weight - eta*dW
+        
+
+    def update_mini_batch(self, trainData, trainLabels, eta, lmbd):
+        loss, dW = self.SVM_loss(trainData, trainLabels, lmbd)
+        self.weight = self.weight - eta*dW
+
+    def SGD(self, trainData, trainLabels, epochs, mini_batch_size, eta, lmbd, testData=None, testLabels=None):
+        if testData is not None: 
+            testNum = len(testData)
+        n = len(trainData)
         ticks = time.time()
         for j in xrange(epochs):
-            mini_batches = [
-                training_data[k:k+mini_batch_size]
-                for k in xrange(0, n, mini_batch_size)]
-            for mini_batch in mini_batches:
-                self.update_mini_batch(mini_batch, eta)
+            np.random.shuffle(trainData.T)
+            for k in xrange(0, n, mini_batch_size):
+                loss, dW = self.SVM_loss(trainData[k:k+mini_batch_size], trainLabels[k:k+mini_batch_size], lmbd)
+                self.weight = self.weight - eta*dW
             deltaTicks = time.time() - ticks
             ticks = time.time()
-            if testData and testLabels:
-                print "Epoch {0}: {1} / {2} consuming {3}s".format(
-                    j, self.evaluate(testData, testLabels), n_test, deltaTicks)
+            if testData is not None and testLabels is not None:
+                print "Epoch {0}: {1} / {2} consuming {3}s loss:{4}".format(
+                    j, self.evaluate(testData, testLabels), testNum, deltaTicks, loss)
             else:
-                print "Epoch {0} complete consuming {1}s".format(j, deltaTicks)
- """
-    
-    
+                print "Epoch {0} complete consuming {1}s loss:{4}".format(j, deltaTicks, loss)
+
 
