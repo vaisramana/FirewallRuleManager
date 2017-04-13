@@ -24,6 +24,18 @@ class Softmax(object):
         imageNum = trainData.shape[0]
         classNum = weight.shape[1]
         
+        for i in xrange(imageNum):
+            f_i = np.dot(trainData[i,:],weight)
+            log_C = np.max(f_i)
+            f_i -= log_C
+
+            sum_i = np.sum(np.exp(f_i))
+            loss += -f_i[trainLabels[i]] + np.log(sum_i)
+            for j in range(classNum):
+                p = np.exp(f_i[j]) / sum_i
+                dW[:,j] += (p - (j == trainLabels[i])) * trainData[i,:]
+
+        """        
         #0...N-1
         for i in xrange(imageNum):
             #1*3073 dot 3073*10 = 1*10
@@ -38,7 +50,7 @@ class Softmax(object):
             #1*10->10*1 x 1*3073 , update the whole 3073*10 weight matrix for every image
             for j in xrange(classNum):
                 dW[:,j] += trainData[i]*((a-trainLabels[i])[j])
-
+        """
         loss /= imageNum
         dW /= imageNum
 
