@@ -4,17 +4,17 @@ import time
 
 class SVM(object):
     def __init__(self):
-        self.weight = np.random.randn(32*32*3+1,10)*1e4
+        self.weight = np.random.randn(32*32*3+1,10)
         self.delta = 1
-        print "initial weight average is %f" %(self.weight.mean())
+        #print "initial weight average is %f" %(self.weight.mean())
 
 
     def SVM_loss(self, trainData, trainLabels, lmbd):
         """
         input N images 
-        x : N*3073, one line represents one image
-        y : N*10
-        w : 3073*10
+        trainData : N*3073, one line represents one image
+        trainLabels : N*10
+        weight : 3073*10
         """
 
         #initialize the gradient as zero
@@ -73,7 +73,8 @@ class SVM(object):
         n = len(trainData)
         ticks = time.time()
         for j in xrange(epochs):
-            np.random.shuffle(trainData.T)
+            #something wrong with shuffle usage below
+            #np.random.shuffle(trainData.T)
             for k in xrange(0, n, mini_batch_size):
                 loss, dW = self.SVM_loss(trainData[k:k+mini_batch_size], trainLabels[k:k+mini_batch_size], lmbd)
                 self.weight = self.weight - eta*dW
@@ -83,7 +84,7 @@ class SVM(object):
                 print "Epoch {0}: {1}/{2} on test data and {3}/{4} on train data consuming {5}s loss:{6}".format(
                     j, self.predict(testData, testLabels), testNum, 
                     self.predict(trainData, trainLabels), len(trainData), deltaTicks, loss)
-                print "weight average: %f" %(self.weight.mean())
+                #print "weight average: %f" %(self.weight.mean())
             else:
                 print "Epoch {0} complete consuming {1}s loss:{2}".format(j, deltaTicks, loss)
 
