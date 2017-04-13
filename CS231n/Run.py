@@ -29,8 +29,7 @@ learning_rates = [1.4e-7, 1.5e-7, 1.6e-7]
 regularization_strengths = [3e4, 3.1e4, 3.2e4, 3.3e4, 3.4e4]
 svm = SVM.SVM()
 eta = learning_rates[0]
-lmbd = 100
-
+lmbd = regularization_strengths[0]
 #10000*3072 -> 10000*3073 add one more all-one line in the bottom
 trainData = np.concatenate((trainData,np.ones((trainData.shape[0],1))),axis=1) 
 testData = np.concatenate((testData,np.ones((testData.shape[0],1))),axis=1) 
