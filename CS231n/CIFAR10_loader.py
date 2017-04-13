@@ -1,6 +1,7 @@
 
 import tarfile
 import cPickle
+import numpy as np
 
 def load_CIFAR10(inputFileName=""):
     isTheFirstFile = True
