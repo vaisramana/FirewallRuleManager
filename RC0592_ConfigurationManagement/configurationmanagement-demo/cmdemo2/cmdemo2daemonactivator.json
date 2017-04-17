@@ -1,0 +1,9 @@
+{
+    "activator":
+    {
+        "name": "cmdemo2daemonactivator",
+        "execute": ["systemctl","reload","cmdemo2daemon"],
+        "notificationKeys": ["cmexample2notificationkey"],
+        "executeAtNodeStartup": false
+    }
+}

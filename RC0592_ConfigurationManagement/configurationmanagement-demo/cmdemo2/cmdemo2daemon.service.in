@@ -1,0 +1,7 @@
+[Unit]
+Description=CM demo2 daemon
+
+[Service]
+Type=simple
+ExecStart=@bindir@/cmdemo2daemon
+ExecReload=/bin/kill -HUP $MAINPID
