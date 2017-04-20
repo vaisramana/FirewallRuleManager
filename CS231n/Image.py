@@ -26,7 +26,7 @@ def tint(image):
 
 def PCA(image):
     # Read an JPEG image into a numpy array  
-    evNumChosen = 20
+    evNumChosen = 50
     if './' in image:
         image = image.split('./')[1]
     img = imread(image)  
@@ -34,24 +34,41 @@ def PCA(image):
     img=img.astype(np.float64)
     img -= np.mean(img,axis=0)
 
-    imgRot = np.zeros(img.shape)
+    imgPCA = np.zeros(img.shape)
+    imgWhitening = np.zeros(img.shape)
 
     #one color image PCA
     cov = np.dot(img[:,:,0].T, img[:,:,0]) / img.shape[0]
     U,S,V = np.linalg.svd(cov)
-    imgRot_1c = np.dot(img[:,:,0],U[:,:evNumChosen])
-    imgRot_1c = np.dot(imgRot_1c,U.transpose()[:evNumChosen,:])
-    imsave(image.split('.')[0]+"_rot_1c."+image.split('.')[1], imgRot_1c)
+    tmp_1c = np.dot(img[:,:,0],U[:,:evNumChosen])
+    imgPca_1c = np.dot(tmp_1c,U.transpose()[:evNumChosen,:])
+    #whitening
+    tmp_1c = tmp_1c / np.sqrt(S[:evNumChosen] + 1e-5)
+    imgWhitening_1c = np.dot(tmp_1c,U.transpose()[:evNumChosen,:])
+
+    imsave(image.split('.')[0]+"_pca_1c."+image.split('.')[1], imgPca_1c)
+    imsave(image.split('.')[0]+"_whitening_1c."+image.split('.')[1], imgWhitening_1c)
+
 
     #RGB image PCA
     for i in xrange(3):
         cov = np.dot(img[:,:,i].T, img[:,:,i]) / img.shape[0]
         U,S,V = np.linalg.svd(cov)
         tmp = np.dot(img[:,:,i],U[:,:evNumChosen])
-        imgRot[:,:,i] = np.dot(tmp,U.transpose()[:evNumChosen,:])
+        imgPCA[:,:,i] = np.dot(tmp,U.transpose()[:evNumChosen,:])
+        #whitening
+        tmp = tmp / np.sqrt(S[:evNumChosen] + 1e-5)
+        imgWhitening[:,:,i] = np.dot(tmp,U.transpose()[:evNumChosen,:])
 
     
-    imsave(image.split('.')[0]+"_rotated."+image.split('.')[1], imgRot)
+    imsave(image.split('.')[0]+"_pca."+image.split('.')[1], imgPCA)
+    imsave(image.split('.')[0]+"_whitening."+image.split('.')[1], imgWhitening)
+    
+
+
+
+
+
         
 tint('./Koala.jpg')
 PCA('./Koala.jpg')
