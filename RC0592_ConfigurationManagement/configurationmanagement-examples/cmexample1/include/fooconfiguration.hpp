@@ -26,7 +26,7 @@ namespace cmexample1
         
         void writeFoo(const std::string& txid, const Foo& foo);
         std::shared_ptr<Foo> readFoo(const std::string& txid, int fooId);
-        std::shared_ptr<FooIdDescriptionPairs> readDescriptions(const std::string& txid);
+        //std::shared_ptr<FooIdDescriptionPairs> readDescriptions(const std::string& txid);
         void deleteFoo(const std::string& txid, int fooId);
 
     private:

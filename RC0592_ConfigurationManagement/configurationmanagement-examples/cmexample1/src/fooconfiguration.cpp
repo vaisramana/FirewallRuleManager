@@ -57,7 +57,7 @@ std::shared_ptr<cmexample1::Foo> FooConfiguration::readFoo(const std::string& tx
 
     return foo;
 }
-
+#if 0
 std::shared_ptr<FooConfiguration::FooIdDescriptionPairs> FooConfiguration::readDescriptions(const std::string& txid)
 {
     auto descriptions = std::make_shared<FooIdDescriptionPairs>();
@@ -74,6 +74,7 @@ std::shared_ptr<FooConfiguration::FooIdDescriptionPairs> FooConfiguration::readD
 
     return descriptions;
 }
+#endif
 
 void FooConfiguration::deleteFoo(const std::string& txid, int fooId)
 {

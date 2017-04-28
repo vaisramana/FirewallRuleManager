@@ -1,7 +1,49 @@
 package cmexample1domain.requestinterface;
 
 message Foo {
-    optional int32 id = 1;
-    optional string description = 2;
-    repeated string value = 3;
+    repeated string fsipNetworkObjectName = 1;
+    repeated string fsipNetworkObjectOwner = 2;
+    repeated string fsipNetworkObjectAddPhase = 3;
+    repeated string fsipNetworkObjectDelPhase = 4;
+    repeated string fsipNetworkObjectPriority = 5;
+    repeated string fsipNetworkObjectDynamic = 6;
+    repeated string fsipACLRuleIndex = 7;
+    repeated string fsipACLRuleChain = 8;
+    repeated string fsipACLRuleAction = 9;
+    repeated string fsipACLRuleTable = 10;
+    repeated string fsipACLRuleFamily = 11;
+    repeated string fsipACLRuleDSCP = 12;
+    repeated string fsipACLRuleInInterface = 13;
+    repeated string fsipACLRuleOutInterface = 14;
+    repeated string fsipACLRuleProtocol = 15;
+    repeated string fsipACLRuleSrcPortStart = 16;
+    repeated string fsipACLRuleDstPortStart = 17;
+    repeated string fsipACLRuleSrcPortEnd = 18;
+    repeated string fsipACLRuleDstPortEnd = 19;
+    repeated string fsipACLRuleSrc = 20;
+    repeated string fsipACLRuleDst = 21;
+    repeated string fsipACLRuleSrcLength = 22;
+    repeated string fsipACLRuleDstLength = 23;
+    repeated string fsipACLRuleActionDSCP = 24;
+    repeated string fsipACLRuleVRF = 25;
+    repeated string fsipACLRuleICMPType = 26;
+    repeated string fsipACLRuleICMPCode = 27;
+    repeated string fsipACLRuleLimit = 28;
+    repeated string fsipACLRuleLimitBurst = 29;
+
+    repeated string fsipNetworkObjectPostDelCmd = 40; 
+    repeated string fsipNetworkObjectNodeName = 42;
+    repeated string fsipNetworkObjectUserModifiable = 48;
+    repeated string fsipNetworkObjectUserDeletable = 49;
+    repeated string fsipNetworkObjectUser = 50;
+    repeated string fsipNetworkObjectDependency = 51;
+    repeated string fsipNetworkObjectPreAddCmd = 52;
+    repeated string fsipNetworkObjectPostAddCmd = 53;
+    repeated string fsipNetworkObjectPreDelCmd = 54;
+    repeated string objectClass = 55;
+    repeated string key = 56;
+    
+    optional int32 id = 100;
+    optional string description = 101;
+    repeated string value = 102;
 }

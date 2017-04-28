@@ -28,9 +28,11 @@ std::shared_ptr<const google::protobuf::Message> FooRequestHandlerPlugin::execut
         case (ReadRequest::READ_FOO):
             response->set_status(handleReadFooRequest(reader, request.readfoorequest(), response->mutable_readfooresponse()));
             break;
+#if 0
         case (ReadRequest::READ_ALL_DESCRIPTIONS):
             handleReadAllDescriptionsRequest(reader, response->mutable_readalldescriptionsresponse());
             break;
+#endif
         default:
             syslog(LOG_ERR, "FooRequestHandlerPlugin::executeReadOnlyRequest, unsupported request type: %d", request.type());
             response->set_status(ReadResponse::INVALID_TYPE);
@@ -108,7 +110,7 @@ ReadResponse::Status FooRequestHandlerPlugin::handleReadFooRequest(Reader& reade
 
     return ReadResponse::SUCCESS;
 }
-
+#if 0
 void FooRequestHandlerPlugin::handleReadAllDescriptionsRequest(Reader& reader,
                                                               ReadAllDescriptionsResponse* response)
 {
@@ -123,6 +125,7 @@ void FooRequestHandlerPlugin::handleReadAllDescriptionsRequest(Reader& reader,
         item->set_description(fooDescription.description());
     }
 }
+#endif
 
 void FooRequestHandlerPlugin::handleDeleteFooRequest(ReaderWriter& readerWriter,
                                                     const DeleteFooRequest& request)

@@ -35,7 +35,7 @@ namespace cmexample1
         ReadResponse::Status handleReadFooRequest(Reader& reader,
                                                   const ReadFooRequest& request,
                                                   ReadFooResponse* response);
-        void handleReadAllDescriptionsRequest(Reader& reader, ReadAllDescriptionsResponse* response);
+        //void handleReadAllDescriptionsRequest(Reader& reader, ReadAllDescriptionsResponse* response);
         void handleDeleteFooRequest(ReaderWriter& readerWriter, const DeleteFooRequest& request);
     };
 }

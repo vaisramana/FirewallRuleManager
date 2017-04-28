@@ -11,11 +11,9 @@ BASE_LIBS =
 
 dist_noinst_DATA = \
     protobuf/cmexample1domain/requestinterface/foo.proto \
-    protobuf/cmexample1domain/requestinterface/fooiddescriptionpair.proto \
     protobuf/cmexample1domain/requestinterface/readfoorequest.proto \
     protobuf/cmexample1domain/requestinterface/readrequest.proto \
     protobuf/cmexample1domain/requestinterface/readfooresponse.proto \
-    protobuf/cmexample1domain/requestinterface/readalldescriptionsresponse.proto \
     protobuf/cmexample1domain/requestinterface/readresponse.proto \
     protobuf/cmexample1domain/requestinterface/writefoorequest.proto \
     protobuf/cmexample1domain/requestinterface/deletefoorequest.proto \
@@ -26,11 +24,9 @@ dist_noinst_DATA = \
 
 BUILT_SOURCES = \
     $(builddir)/protobuf/cmexample1domain/requestinterface/foo.pb.h \
-    $(builddir)/protobuf/cmexample1domain/requestinterface/fooiddescriptionpair.pb.h \
     $(builddir)/protobuf/cmexample1domain/requestinterface/readfoorequest.pb.h \
     $(builddir)/protobuf/cmexample1domain/requestinterface/readrequest.pb.h \
     $(builddir)/protobuf/cmexample1domain/requestinterface/readfooresponse.pb.h \
-    $(builddir)/protobuf/cmexample1domain/requestinterface/readalldescriptionsresponse.pb.h \
     $(builddir)/protobuf/cmexample1domain/requestinterface/readresponse.pb.h \
     $(builddir)/protobuf/cmexample1domain/requestinterface/deletefoorequest.pb.h \
     $(builddir)/protobuf/cmexample1domain/requestinterface/writefoorequest.pb.h \
@@ -44,16 +40,12 @@ BUILT_SOURCES = \
 nodist_libcmexample1protobuf_la_SOURCES = \
     protobuf/cmexample1domain/requestinterface/foo.pb.cc \
     protobuf/cmexample1domain/requestinterface/foo.pb.h \
-    protobuf/cmexample1domain/requestinterface/fooiddescriptionpair.pb.cc \
-    protobuf/cmexample1domain/requestinterface/fooiddescriptionpair.pb.h \
     protobuf/cmexample1domain/requestinterface/readfoorequest.pb.cc \
     protobuf/cmexample1domain/requestinterface/readfoorequest.pb.h \
     protobuf/cmexample1domain/requestinterface/readrequest.pb.cc \
     protobuf/cmexample1domain/requestinterface/readrequest.pb.h \
     protobuf/cmexample1domain/requestinterface/readfooresponse.pb.cc \
     protobuf/cmexample1domain/requestinterface/readfooresponse.pb.h \
-    protobuf/cmexample1domain/requestinterface/readalldescriptionsresponse.pb.cc \
-    protobuf/cmexample1domain/requestinterface/readalldescriptionsresponse.pb.h \
     protobuf/cmexample1domain/requestinterface/readresponse.pb.cc \
     protobuf/cmexample1domain/requestinterface/readresponse.pb.h \
     protobuf/cmexample1domain/requestinterface/deletefoorequest.pb.cc \
@@ -64,8 +56,6 @@ nodist_libcmexample1protobuf_la_SOURCES = \
     protobuf/cmexample1domain/requestinterface/readwriterequest.pb.h \
     protobuf/cmexample1domain/requestinterface/readwriteresponse.pb.cc \
     protobuf/cmexample1domain/requestinterface/readwriteresponse.pb.h \
-    protobuf/cmexample1domain/databasevalues/foodescription.pb.cc \
-    protobuf/cmexample1domain/databasevalues/foodescription.pb.h \
     protobuf/cmexample1domain/databasevalues/foovalues.pb.cc \
     protobuf/cmexample1domain/databasevalues/foovalues.pb.h
 
@@ -129,16 +119,12 @@ MOSTLYCLEANFILES = \
     cmexample1.json \
     protobuf/cmexample1domain/requestinterface/foo.pb.cc \
     protobuf/cmexample1domain/requestinterface/foo.pb.h \
-    protobuf/cmexample1domain/requestinterface/fooiddescriptionpair.pb.cc \
-    protobuf/cmexample1domain/requestinterface/fooiddescriptionpair.pb.h \
     protobuf/cmexample1domain/requestinterface/readfoorequest.pb.cc \
     protobuf/cmexample1domain/requestinterface/readfoorequest.pb.h \
     protobuf/cmexample1domain/requestinterface/readrequest.pb.cc \
     protobuf/cmexample1domain/requestinterface/readrequest.pb.h \
     protobuf/cmexample1domain/requestinterface/readfooresponse.pb.cc \
     protobuf/cmexample1domain/requestinterface/readfooresponse.pb.h \
-    protobuf/cmexample1domain/requestinterface/readalldescriptionsresponse.pb.cc \
-    protobuf/cmexample1domain/requestinterface/readalldescriptionsresponse.pb.h \
     protobuf/cmexample1domain/requestinterface/readresponse.pb.cc \
     protobuf/cmexample1domain/requestinterface/readresponse.pb.h \
     protobuf/cmexample1domain/requestinterface/deletefoorequest.pb.cc \
@@ -149,7 +135,5 @@ MOSTLYCLEANFILES = \
     protobuf/cmexample1domain/requestinterface/readwriterequest.pb.h \
     protobuf/cmexample1domain/requestinterface/readwriteresponse.pb.cc \
     protobuf/cmexample1domain/requestinterface/readwriteresponse.pb.h \
-    protobuf/cmexample1domain/databasevalues/foodescription.pb.cc \
-    protobuf/cmexample1domain/databasevalues/foodescription.pb.h \
     protobuf/cmexample1domain/databasevalues/foovalues.pb.cc \
     protobuf/cmexample1domain/databasevalues/foovalues.pb.h
