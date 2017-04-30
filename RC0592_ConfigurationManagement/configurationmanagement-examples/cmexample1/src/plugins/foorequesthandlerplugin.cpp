@@ -67,6 +67,24 @@ std::shared_ptr<const google::protobuf::Message> FooRequestHandlerPlugin::execut
     return response;
 }
 
+
+ReadWriteResponse::Status FooRequestHandlerPlugin::handleWriteFooRequest(ReaderWriter& readerWriter,
+                                                                        const WriteFooRequest& request)
+{
+    auto foo = std::make_shared<Foo>();
+    foo->set_description(request.foo().description());
+    foo->set_fsipaclrulesrc(request.foo().fsipaclrulesrc());
+    foo->set_fsipaclruleindex(request.foo().fsipaclruleindex());
+    foo->set_fsipaclruleaction(request.foo().fsipaclruleaction());
+    //foo = request.mutable_foo();
+    //readerWriter.write("allFoo", std::make_shared<protobuf::ethipconfdomain::Foo>(request.mutable_foo()));
+    readerWriter.write("allFoo", foo);
+    return ReadWriteResponse::SUCCESS;
+}
+
+
+#if 0
+
 ReadWriteResponse::Status FooRequestHandlerPlugin::handleWriteFooRequest(ReaderWriter& readerWriter,
                                                                         const WriteFooRequest& request)
 {
@@ -86,6 +104,27 @@ ReadWriteResponse::Status FooRequestHandlerPlugin::handleWriteFooRequest(ReaderW
 
     return ReadWriteResponse::SUCCESS;
 }
+
+
+ReadResponse::Status FooRequestHandlerPlugin::handleReadFooRequest(Reader& reader,
+                                                                  const ReadFooRequest& request,
+                                                                  ReadFooResponse* response)
+{
+    response->mutable_foo()->set_id(request.fooid());
+
+    Foo foo;
+    auto keys = reader.getAllKeys();
+    for (const auto& keyInDB : keys)
+    {
+        auto configuration = reader.read(keyInDB);
+        configuration.parse(foo);
+    }
+
+    return ReadResponse::SUCCESS;
+}
+
+#endif
+
 
 ReadResponse::Status FooRequestHandlerPlugin::handleReadFooRequest(Reader& reader,
                                                                   const ReadFooRequest& request,

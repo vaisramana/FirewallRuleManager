@@ -26,6 +26,9 @@ void FooConfiguration::writeFoo(const std::string& txid, const Foo& foo)
     readWriteRequest.set_type(ReadWriteRequest::WRITE_FOO);
     readWriteRequest.mutable_writefoorequest()->mutable_foo()->set_id(foo.id);
     readWriteRequest.mutable_writefoorequest()->mutable_foo()->set_description(foo.description);
+    readWriteRequest.mutable_writefoorequest()->mutable_foo()->set_fsipaclrulesrc(foo.fsipACLRuleSrc);
+    readWriteRequest.mutable_writefoorequest()->mutable_foo()->set_fsipaclruleindex(foo.fsipACLRuleIndex);
+    readWriteRequest.mutable_writefoorequest()->mutable_foo()->set_fsipaclruleaction(foo.fsipACLRuleAction);
     for (const auto& val : foo.values)
         readWriteRequest.mutable_writefoorequest()->mutable_foo()->add_value(val);
 
@@ -53,6 +56,19 @@ std::shared_ptr<cmexample1::Foo> FooConfiguration::readFoo(const std::string& tx
             foo->description = readResponse.mutable_readfooresponse()->foo().description();
         for (const auto& val : readResponse.mutable_readfooresponse()->foo().value())
             foo->values.insert(val);
+        
+        if (readResponse.mutable_readfooresponse()->foo().has_fsipaclrulesrc())
+        {
+            foo->fsipACLRuleSrc = readResponse.mutable_readfooresponse()->foo().fsipaclrulesrc();
+        }
+        if (readResponse.mutable_readfooresponse()->foo().has_fsipaclruleindex())
+        {
+            foo->fsipACLRuleIndex = readResponse.mutable_readfooresponse()->foo().fsipaclruleindex();
+        }
+        if (readResponse.mutable_readfooresponse()->foo().has_fsipaclruleaction())
+        {
+            foo->fsipACLRuleAction = readResponse.mutable_readfooresponse()->foo().fsipaclruleaction();
+        }
     }
 
     return foo;
