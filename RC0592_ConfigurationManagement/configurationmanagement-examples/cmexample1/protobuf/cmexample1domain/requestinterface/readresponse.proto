@@ -1,6 +1,7 @@
 package cmexample1domain.requestinterface;
 
 import "protobuf/cmexample1domain/requestinterface/readfooresponse.proto";
+import "protobuf/cmexample1domain/requestinterface/readalldescriptionsresponse.proto";
 
 message ReadResponse {
     enum Status {
@@ -11,4 +12,5 @@ message ReadResponse {
     }
     optional Status status = 1;
     optional ReadFooResponse readFooResponse = 2;
+    optional ReadAllDescriptionsResponse readAllDescriptionsResponse = 3;
 }

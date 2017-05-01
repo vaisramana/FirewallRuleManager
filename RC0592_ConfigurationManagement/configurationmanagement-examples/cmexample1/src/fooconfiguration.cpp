@@ -4,6 +4,8 @@
 #include "protobuf/cmexample1domain/requestinterface/readresponse.pb.h"
 #include "protobuf/cmexample1domain/requestinterface/readwriterequest.pb.h"
 #include "protobuf/cmexample1domain/requestinterface/readwriteresponse.pb.h"
+#include <syslog.h>
+
 
 using namespace cmexample1;
 using namespace cmexample1domain::requestinterface;
@@ -31,19 +33,23 @@ void FooConfiguration::writeFoo(const std::string& txid, const Foo& foo)
     readWriteRequest.mutable_writefoorequest()->mutable_foo()->set_fsipaclruleaction(foo.fsipACLRuleAction);
     for (const auto& val : foo.values)
         readWriteRequest.mutable_writefoorequest()->mutable_foo()->add_value(val);
-
+    syslog(LOG_INFO, "writeFoo fsipaclruleindex: %s %s", (readWriteRequest.mutable_writefoorequest()->mutable_foo()->fsipaclruleindex()).c_str(),foo.fsipACLRuleIndex.c_str());
+        
     ReadWriteResponse readWriteResponse;
     requestDispatcher->readWriteRequest(txid, domainName, readWriteRequest).parse(readWriteResponse);
     checkReadWriteResponse(readWriteResponse);
 }
 
-std::shared_ptr<cmexample1::Foo> FooConfiguration::readFoo(const std::string& txid, int fooId)
+std::shared_ptr<cmexample1::Foo> FooConfiguration::readFoo(const std::string& txid, std::string fsipaclruleindex)
 {
     auto foo = std::make_shared<Foo>();
 
     ReadRequest readRequest;
     readRequest.set_type(ReadRequest::READ_FOO);
-    readRequest.mutable_readfoorequest()->set_fooid(fooId);
+    //readRequest.mutable_readfoorequest()->set_fooid(fooId);
+    readRequest.mutable_readfoorequest()->set_fsipaclruleindex(fsipaclruleindex);
+    syslog(LOG_INFO, "readFoo fsipaclruleindex: %s %s", (readRequest.mutable_readfoorequest()->fsipaclruleindex()).c_str(),fsipaclruleindex.c_str());
+         
 
     ReadResponse readResponse;
     requestDispatcher->readOnlyRequest(txid, domainName, readRequest).parse(readResponse);
@@ -73,7 +79,7 @@ std::shared_ptr<cmexample1::Foo> FooConfiguration::readFoo(const std::string& tx
 
     return foo;
 }
-#if 0
+
 std::shared_ptr<FooConfiguration::FooIdDescriptionPairs> FooConfiguration::readDescriptions(const std::string& txid)
 {
     auto descriptions = std::make_shared<FooIdDescriptionPairs>();
@@ -87,16 +93,15 @@ std::shared_ptr<FooConfiguration::FooIdDescriptionPairs> FooConfiguration::readD
 
     for (const auto& i : readResponse.mutable_readalldescriptionsresponse()->fooiddescriptionpair())
         descriptions->insert(std::make_pair(i.fooid(), i.description()));
-
     return descriptions;
 }
-#endif
 
-void FooConfiguration::deleteFoo(const std::string& txid, int fooId)
+
+void FooConfiguration::deleteFoo(const std::string& txid, std::string fsipACLRuleIndex)
 {
     ReadWriteRequest readWriteRequest;
     readWriteRequest.set_type(ReadWriteRequest::DELETE_FOO);
-    readWriteRequest.mutable_deletefoorequest()->set_fooid(fooId);
+    readWriteRequest.mutable_deletefoorequest()->set_fsipaclruleindex(fsipACLRuleIndex);
 
     ReadWriteResponse readWriteResponse;
     requestDispatcher->readWriteRequest(txid, domainName, readWriteRequest).parse(readWriteResponse);
@@ -116,7 +121,7 @@ namespace
     void checkReadResponse(const ReadResponse& response)
     {
         if (response.status() == ReadResponse::FOO_NOT_FOUND)
-            throw FooConfiguration::FooNotFoundException("Given Foo ID does not exist.");
+            throw FooConfiguration::FooNotFoundException("Given Foo ID does not exist. ID: " + response.readfooresponse().foo().fsipaclruleindex());
         if (response.status() != ReadResponse::SUCCESS)
             throw FooConfiguration::InternalErrorException("Internal error: " + boost::lexical_cast<std::string>(response.status()));
     }

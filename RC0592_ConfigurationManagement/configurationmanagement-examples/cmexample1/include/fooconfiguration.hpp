@@ -25,9 +25,10 @@ namespace cmexample1
         FooConfiguration& operator = (const FooConfiguration&) = delete;
         
         void writeFoo(const std::string& txid, const Foo& foo);
-        std::shared_ptr<Foo> readFoo(const std::string& txid, int fooId);
-        //std::shared_ptr<FooIdDescriptionPairs> readDescriptions(const std::string& txid);
-        void deleteFoo(const std::string& txid, int fooId);
+        //std::shared_ptr<Foo> readFoo(const std::string& txid, int fooId);
+        std::shared_ptr<Foo> readFoo(const std::string& txid, std::string fsipaclruleindex);
+        std::shared_ptr<FooIdDescriptionPairs> readDescriptions(const std::string& txid);
+        void deleteFoo(const std::string& txid, std::string fsipACLRuleIndex);
 
     private:
         std::string domainName;

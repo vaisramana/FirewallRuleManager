@@ -7,13 +7,20 @@ using namespace cmexample1;
 
 FooKeyFormatter::FooKeyFormatter():
         descriptionKeyPrefix("foo_description_"),
-        valuesKeyPrefix("foo_values_")
+        valuesKeyPrefix("foo_values_"),
+        ACLRuleIndexKeyPrefix("ACLRule_index_")
 {
 }
 
 FooKeyFormatter::~FooKeyFormatter()
 {
 }
+
+std::string FooKeyFormatter::getACLRuleIndexKey(const std::string index)
+{
+    return ACLRuleIndexKeyPrefix + index;
+}
+
 
 std::string FooKeyFormatter::getFooDescriptionKey(const int fooId)
 {

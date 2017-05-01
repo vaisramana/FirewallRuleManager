@@ -2,4 +2,5 @@ package cmexample1domain.requestinterface;
 
 message DeleteFooRequest {
     optional int32 fooId = 1;
+    optional string fsipACLRuleIndex = 2;
 }

@@ -2,6 +2,8 @@
 #include <syslog.h>
 #include "protobuf/cmexample1domain/databasevalues/foodescription.pb.h"
 #include "protobuf/cmexample1domain/databasevalues/foovalues.pb.h"
+#include <iostream>
+
 
 using namespace cmexample1;
 using namespace cmexample1domain::databasevalues;
@@ -71,15 +73,22 @@ std::shared_ptr<const google::protobuf::Message> FooRequestHandlerPlugin::execut
 ReadWriteResponse::Status FooRequestHandlerPlugin::handleWriteFooRequest(ReaderWriter& readerWriter,
                                                                         const WriteFooRequest& request)
 {
-    auto foo = std::make_shared<Foo>();
-    foo->set_description(request.foo().description());
-    foo->set_fsipaclrulesrc(request.foo().fsipaclrulesrc());
-    foo->set_fsipaclruleindex(request.foo().fsipaclruleindex());
-    foo->set_fsipaclruleaction(request.foo().fsipaclruleaction());
-    //foo = request.mutable_foo();
-    //readerWriter.write("allFoo", std::make_shared<protobuf::ethipconfdomain::Foo>(request.mutable_foo()));
-    readerWriter.write("allFoo", foo);
-    return ReadWriteResponse::SUCCESS;
+    if (request.foo().has_fsipaclruleindex())
+    {
+        auto foo = std::make_shared<Foo>();
+        foo->set_description(request.foo().description());
+        foo->set_fsipaclrulesrc(request.foo().fsipaclrulesrc());
+        foo->set_fsipaclruleindex(request.foo().fsipaclruleindex());
+        foo->set_fsipaclruleaction(request.foo().fsipaclruleaction());
+        //foo = request.mutable_foo();
+        //readerWriter.write("allFoo", std::make_shared<protobuf::ethipconfdomain::Foo>(request.mutable_foo()));
+        readerWriter.write(keyFormatter.getACLRuleIndexKey(request.foo().fsipaclruleindex()), foo);
+        syslog(LOG_INFO, "handleWriteFooRequest fsipaclruleindex: %s, key: %s", (request.foo().fsipaclruleindex()).c_str(),(keyFormatter.getACLRuleIndexKey(request.foo().fsipaclruleindex())).c_str());
+        std::cout<<"handleWriteFooRequest key: "<<keyFormatter.getACLRuleIndexKey(request.foo().fsipaclruleindex())<<std::endl;
+        return ReadWriteResponse::SUCCESS;
+    }
+    else
+        return ReadWriteResponse::FOO_ID_MISSING;
 }
 
 
@@ -104,27 +113,39 @@ ReadWriteResponse::Status FooRequestHandlerPlugin::handleWriteFooRequest(ReaderW
 
     return ReadWriteResponse::SUCCESS;
 }
+#endif
 
 
 ReadResponse::Status FooRequestHandlerPlugin::handleReadFooRequest(Reader& reader,
                                                                   const ReadFooRequest& request,
                                                                   ReadFooResponse* response)
 {
-    response->mutable_foo()->set_id(request.fooid());
-
     Foo foo;
+    response->mutable_foo()->set_fsipaclruleindex(request.fsipaclruleindex());
+    syslog(LOG_INFO, "handleReadFooRequest fsipaclruleindex: %s, key: %s", (request.fsipaclruleindex()).c_str(), (keyFormatter.getACLRuleIndexKey(request.fsipaclruleindex())).c_str());
+    std::cout<<"handleReadFooRequest key: "<<keyFormatter.getACLRuleIndexKey(request.fsipaclruleindex())<<std::endl;
+    auto serializedDescription = reader.read(keyFormatter.getACLRuleIndexKey(request.fsipaclruleindex()));
+    if (serializedDescription == nullptr)
+        return ReadResponse::FOO_NOT_FOUND;
+    serializedDescription.parse(foo);
+    response->mutable_foo()->set_description(foo.description());
+    response->mutable_foo()->set_fsipaclrulesrc(foo.fsipaclrulesrc());
+    response->mutable_foo()->set_fsipaclruleaction(foo.fsipaclruleaction());
+    
+/*
     auto keys = reader.getAllKeys();
     for (const auto& keyInDB : keys)
     {
         auto configuration = reader.read(keyInDB);
         configuration.parse(foo);
     }
-
+*/
     return ReadResponse::SUCCESS;
 }
 
-#endif
 
+
+#if 0
 
 ReadResponse::Status FooRequestHandlerPlugin::handleReadFooRequest(Reader& reader,
                                                                   const ReadFooRequest& request,
@@ -149,7 +170,7 @@ ReadResponse::Status FooRequestHandlerPlugin::handleReadFooRequest(Reader& reade
 
     return ReadResponse::SUCCESS;
 }
-#if 0
+
 void FooRequestHandlerPlugin::handleReadAllDescriptionsRequest(Reader& reader,
                                                               ReadAllDescriptionsResponse* response)
 {
@@ -169,8 +190,14 @@ void FooRequestHandlerPlugin::handleReadAllDescriptionsRequest(Reader& reader,
 void FooRequestHandlerPlugin::handleDeleteFooRequest(ReaderWriter& readerWriter,
                                                     const DeleteFooRequest& request)
 {
-    readerWriter.remove(keyFormatter.getFooDescriptionKey(request.fooid()));
-    readerWriter.remove(keyFormatter.getFooValuesKey(request.fooid()));
+    if (request.has_fsipaclruleindex())
+    {
+        readerWriter.remove(keyFormatter.getACLRuleIndexKey(request.fsipaclruleindex()));
+    }
+    syslog(LOG_INFO, "handleDeleteFooRequest fsipaclruleindex: %s, key: %s", (request.fsipaclruleindex()).c_str(), (keyFormatter.getACLRuleIndexKey(request.fsipaclruleindex())).c_str());
+    
+    //readerWriter.remove(keyFormatter.getFooDescriptionKey(request.fooid()));
+    //readerWriter.remove(keyFormatter.getFooValuesKey(request.fooid()));
 }
 
 CM_DEFINE_REQUESTHANDLER_PLUGIN_CREATOR()
